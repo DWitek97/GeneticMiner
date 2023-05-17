@@ -1,3 +1,4 @@
+import random
 """
 Modeling approach:
   * define Petri nets in terms of their transactions
@@ -122,32 +123,54 @@ def make_parser():
     parser.add_argument('--marking', type=int, nargs='+')
     return parser
 
+def createTransitions(outArcs, inArcs, listOfTransitions, listOfPlaces):
+    transitionsList = {}
+    for transition in listOfTransitions:
+        
+        listOfOut = []
+        listOfIn = []
+        
+        for i in range(outArcs):
+            index = random.randint(0, len(listOfPlaces) -1 )
+            if listOfPlaces[index] not in listOfOut:
+                listOfOut.append(Out(listOfPlaces[index]))
+
+        for i in range(inArcs):
+            index = random.randint(0, len(listOfPlaces) -1 )
+            if listOfPlaces[index] not in listOfIn:
+                listOfIn.append(In(listOfPlaces[index]))
+
+        transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
+
+    return transitionsList
+
+def createPlaces(amountOfPlaces):
+    listOfPlaces = []
+    for i in range(amountOfPlaces):
+        listOfPlaces.append(Place(1))
+    return listOfPlaces
 
 if __name__ == "__main__":    
     args = make_parser().parse_args()
 
     #ps = [Place(m) for m in args.marking]
     ps = [Place(1), Place(2), Place(3), Place(4)]
+    listOfTransitions = ["A", "B"]
+    amountOfPlaces = len(listOfTransitions) + 2
+    listOfPlaces = createPlaces(amountOfPlaces)
+    amountOfOutArcs = amountOfPlaces * 2 - 1
+    amountOfInArcs = amountOfPlaces * 2 - 1
+    ts2 = createTransitions(amountOfOutArcs, amountOfInArcs, listOfTransitions, listOfPlaces)
 
-    listofTransitions = ["A", "B"]
+    # ts = dict(
+    #     t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
+    #     t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3]), In(ps[0])]),
+    #     )
 
-    transitionsList = {}
-
-    for transition in listofTransitions:
-        transitionsList[transition] = Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])])
-
-    print(transitionsList)
-
-    ts = dict(
-        t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-        t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3]), In(ps[0])]),
-        )
-        
-    from random import choice
     #firing_sequence = [choice(list(ts.keys())) for _ in range(args.firings)] # stochastic execution
     
-    firing_sequence = ["A", "A", "A", "B"] # alternative deterministic example
+    firing_sequence = ["A", "B", "A", "B"] # alternative deterministic example
 
-    petri_net = PetriNet(ts)
-    petri_net.run(firing_sequence, ps)
+    petri_net = PetriNet(ts2)
+    petri_net.run(firing_sequence, listOfPlaces)
     
