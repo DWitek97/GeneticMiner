@@ -55,6 +55,9 @@ class In(ArcBase):
         Add tokens.
         """
         self.place.holding += self.amount
+
+    def non_blocking(self):
+        return self.place.holding == 0
             
 
 class Transition:
@@ -66,20 +69,24 @@ class Transition:
         :in_arcs: Collection of outgoing arcs, to the transition vertex.
         """
         self.name = name
-        self.out_arcs = set(out_arcs)
-        self.arcs = self.out_arcs.union(in_arcs)
+        self.out_arcs = out_arcs
+        self.in_arcs = in_arcs
         
     def fire(self):
         """
         Fire!
         """  
-        not_blocked = all(arc.non_blocking() for arc in self.out_arcs) 
+        outNotBlocked = all(arc.non_blocking() for arc in self.out_arcs)
+        inNotBlocked = all(arc.non_blocking() for arc in self.in_arcs)
         # Note: This would have to be checked differently for variants of
         # petri  nets that take more than once from a place, per transition.
-        if not_blocked:
-            for arc in self.arcs:
+        notBlocked = outNotBlocked and inNotBlocked
+        if notBlocked:
+            for arc in self.out_arcs:
                 arc.trigger()
-        return not_blocked # return if fired, just for the sake of debuging
+            for arc in self.in_arcs:
+                arc.trigger()
+        return notBlocked # return if fired, just for the sake of debuging
     
 
 class PetriNet:
@@ -114,31 +121,46 @@ class PetriNet:
         print("\nfinal {}".format([p.holding for p in ps]))
             
 
-def createTransitions(amountOutArcs, amountInArcs, listOfTransitions, listOfPlaces):
+def createTransitions(listOfTransitions, listOfPlaces):
     transitionsList = {}
     for transition in listOfTransitions:
         
+        duplicateList = []
         listOfOut = []
         listOfIn = []
+        alreadyExists = False
         
-        for i in range(amountOutArcs):
-            index = random.randint(0, len(listOfPlaces) -1 )
-            if listOfPlaces[index] not in listOfOut:
-                listOfOut.append(Out(listOfPlaces[index]))
+        amountOfOutArcs = random.randint(1,4)
+        amountOfInArcs = random.randint(1,4)
 
-        for i in range(amountInArcs):
+        for i in range(amountOfOutArcs):
             index = random.randint(0, len(listOfPlaces) -1 )
-            if listOfPlaces[index] not in listOfIn:
+            for outArc in duplicateList:
+                if listOfPlaces[index].name == outArc.place.name:
+                    alreadyExists = True
+            if not alreadyExists:
+                duplicateList.append(Out(listOfPlaces[index]))
+                listOfOut.append(Out(listOfPlaces[index]))
+            alreadyExists = False
+
+        for i in range(amountOfInArcs):
+            index = random.randint(0, len(listOfPlaces) -1 )
+            for inArc in duplicateList:
+                if listOfPlaces[index].name == inArc.place.name:
+                    alreadyExists = True
+            if not alreadyExists:
+                duplicateList.append(In(listOfPlaces[index]))
                 listOfIn.append(In(listOfPlaces[index]))
+            alreadyExists = False
 
         transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
 
     return transitionsList
 
 def createPlaces(amountOfPlaces):
-    listOfPlaces = []
+    listOfPlaces = [Place(1,"1")]
     for i in range(amountOfPlaces):
-        listOfPlaces.append(Place(1, i + 1))
+        listOfPlaces.append(Place(0, i + 1))
     return listOfPlaces
 
 
@@ -147,27 +169,30 @@ def printPetriNet(petriNet):
         print("Transition: ", transition)
         for outArc in petriNet.transitions[transition].out_arcs:
             print("Places going into Transition ", transition, " : ", outArc.place.name)
-        for inArc in petriNet.transitions[transition].arcs:
+        for inArc in petriNet.transitions[transition].in_arcs:
             print("Places that come after Transition ", transition, " : ", inArc.place.name)
 
 if __name__ == "__main__":    
 
-    listOfTransitions = ["A", "B"]
-    amountOfPlaces = len(listOfTransitions) + 2
-    listOfPlaces = createPlaces(amountOfPlaces)
-    amountOfOutArcs = amountOfPlaces * 2 - 1
-    amountOfInArcs = amountOfPlaces * 2 - 1
-    ts2 = createTransitions(amountOfOutArcs, amountOfInArcs, listOfTransitions, listOfPlaces)
+    listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
-    # ts = dict(
-    #     t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-    #     t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3]), In(ps[0])]),
-    #     )
+    amountOfPlaces = len(listOfTransitions) + random.randint(0, len(listOfTransitions)/2)
+    listOfPlaces = createPlaces(amountOfPlaces)
+    transitions = createTransitions(listOfTransitions, listOfPlaces)
+
+    #static for debugging
+    ps = [Place(1, "1"), Place(0, "2"), Place(1, "3"), Place(0, "4")]
+    ts = dict(
+        t1=Transition("A", [Out(ps[0])], [In(ps[1])]), 
+        t2=Transition("B", [Out(ps[2])], [In(ps[0])]),
+        )
+
 
     
-    firing_sequence = ["A", "B", "A", "B"] # alternative deterministic example
+    firing_sequence = ["A", "B", "C", "D", "E", "F", "G", "H"] # alternative deterministic example
+    firing_sequence2 = ["A", "B", "H"]
+    petri_net = PetriNet(transitions)
 
-    petri_net = PetriNet(ts2)
     #printPetriNet(petri_net)
-    petri_net.run(firing_sequence, listOfPlaces)
+    petri_net.run(firing_sequence2, listOfPlaces)
     
