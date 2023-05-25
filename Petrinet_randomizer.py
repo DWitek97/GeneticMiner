@@ -31,6 +31,9 @@ class ArcBase:
         :place: The one place acting as source/target of the arc as arc in the net
         :amount: The amount of token removed/added from/to the place.
         """
+        self.produced = 0
+        self.consumed = 0
+        self.missing = 0
         self.place = place
         self.amount = amount
         
@@ -41,7 +44,8 @@ class Out(ArcBase):
         Remove token.
         """
         self.place.holding -= self.amount
-        
+        self.consumed += 1
+
     def non_blocking(self):
         """
         Validate action of outgoing arc is possible.
@@ -55,7 +59,8 @@ class In(ArcBase):
         Add tokens.
         """
         self.place.holding += self.amount
-
+        self.produced += 1
+        
     def non_blocking(self):
         return self.place.holding == 0
             
@@ -96,6 +101,7 @@ class PetriNet:
         :transitions: The transitions encoding the net.
         """
         self.transitions = transitions
+        self.fitness = 0
     
     def run(self, firing_sequence, ps):
         """
