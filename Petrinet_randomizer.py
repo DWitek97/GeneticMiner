@@ -15,11 +15,12 @@ References:
 """
 
 class Place:
-    def __init__(self, holding):
+    def __init__(self, holding, name):
         """
         Place vertex in the petri net.
         :holding: Numer of token the place is initialized with.
         """
+        self.name = name
         self.holding = holding
 
     
@@ -113,32 +114,20 @@ class PetriNet:
         print("\nfinal {}".format([p.holding for p in ps]))
             
 
-def make_parser():
-    """
-    :return: A parser reading in some of our simulation paramaters.
-    """
-    from argparse import ArgumentParser
-    parser = ArgumentParser()
-    parser.add_argument('--firings', type=int)
-    parser.add_argument('--marking', type=int, nargs='+')
-    return parser
-
-def createTransitions(outArcs, inArcs, listOfTransitions, listOfPlaces):
+def createTransitions(amountOutArcs, amountInArcs, listOfTransitions, listOfPlaces):
     transitionsList = {}
     for transition in listOfTransitions:
         
         listOfOut = []
         listOfIn = []
         
-        for i in range(outArcs):
+        for i in range(amountOutArcs):
             index = random.randint(0, len(listOfPlaces) -1 )
-            if listOfPlaces[index] not in listOfOut:
-                listOfOut.append(Out(listOfPlaces[index]))
+            listOfOut.append(Out(listOfPlaces[index]))
 
-        for i in range(inArcs):
+        for i in range(amountInArcs):
             index = random.randint(0, len(listOfPlaces) -1 )
-            if listOfPlaces[index] not in listOfIn:
-                listOfIn.append(In(listOfPlaces[index]))
+            listOfIn.append(In(listOfPlaces[index]))
 
         transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
 
@@ -147,14 +136,23 @@ def createTransitions(outArcs, inArcs, listOfTransitions, listOfPlaces):
 def createPlaces(amountOfPlaces):
     listOfPlaces = []
     for i in range(amountOfPlaces):
-        listOfPlaces.append(Place(1))
+        listOfPlaces.append(Place(1, i + 1))
     return listOfPlaces
+
+
+def printPetriNet(petriNet):
+    for transition in petriNet.transitions:
+        print("Transition: ", transition)
+        for outArc in petriNet.transitions[transition].out_arcs:
+            print("Places going into Transition ", transition, " : ", outArc.place.name)
+        for inArc in petriNet.transitions[transition].arcs:
+            print("Places that come after Transition ", transition, " : ", inArc.place.name)
 
 if __name__ == "__main__":    
     args = make_parser().parse_args()
 
     #ps = [Place(m) for m in args.marking]
-    ps = [Place(1), Place(2), Place(3), Place(4)]
+    #ps = [Place(1), Place(2), Place(3), Place(4)]
     listOfTransitions = ["A", "B"]
     amountOfPlaces = len(listOfTransitions) + 2
     listOfPlaces = createPlaces(amountOfPlaces)
@@ -172,5 +170,6 @@ if __name__ == "__main__":
     firing_sequence = ["A", "B", "A", "B"] # alternative deterministic example
 
     petri_net = PetriNet(ts2)
+    #printPetriNet(petri_net)
     petri_net.run(firing_sequence, listOfPlaces)
     
