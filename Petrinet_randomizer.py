@@ -123,11 +123,13 @@ def createTransitions(amountOutArcs, amountInArcs, listOfTransitions, listOfPlac
         
         for i in range(amountOutArcs):
             index = random.randint(0, len(listOfPlaces) -1 )
-            listOfOut.append(Out(listOfPlaces[index]))
+            if listOfPlaces[index] not in listOfOut:
+                listOfOut.append(Out(listOfPlaces[index]))
 
         for i in range(amountInArcs):
             index = random.randint(0, len(listOfPlaces) -1 )
-            listOfIn.append(In(listOfPlaces[index]))
+            if listOfPlaces[index] not in listOfIn:
+                listOfIn.append(In(listOfPlaces[index]))
 
         transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
 
@@ -149,10 +151,7 @@ def printPetriNet(petriNet):
             print("Places that come after Transition ", transition, " : ", inArc.place.name)
 
 if __name__ == "__main__":    
-    args = make_parser().parse_args()
 
-    #ps = [Place(m) for m in args.marking]
-    #ps = [Place(1), Place(2), Place(3), Place(4)]
     listOfTransitions = ["A", "B"]
     amountOfPlaces = len(listOfTransitions) + 2
     listOfPlaces = createPlaces(amountOfPlaces)
@@ -165,7 +164,6 @@ if __name__ == "__main__":
     #     t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3]), In(ps[0])]),
     #     )
 
-    #firing_sequence = [choice(list(ts.keys())) for _ in range(args.firings)] # stochastic execution
     
     firing_sequence = ["A", "B", "A", "B"] # alternative deterministic example
 
