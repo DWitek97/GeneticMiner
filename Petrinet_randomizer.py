@@ -50,7 +50,11 @@ class Out(ArcBase):
         """
         Validate action of outgoing arc is possible.
         """
-        return self.place.holding >= self.amount 
+        if self.place.holding >= self.amount:
+            return True
+        else:
+            self.missing +=1
+            return True 
         
 
 class In(ArcBase):  
@@ -178,6 +182,28 @@ def printPetriNet(petriNet):
         for inArc in petriNet.transitions[transition].in_arcs:
             print("Places that come after Transition ", transition, " : ", inArc.place.name)
 
+def printProducedConsumed(petriNet):
+    for transition in petriNet.transitions:
+        print("Transition: ", transition)
+        for outArc in petriNet.transitions[transition].out_arcs:
+            print("Consumed ", transition, " : ", outArc.consumed)
+        for inArc in petriNet.transitions[transition].in_arcs:
+            print("Produced ", transition, " : ", inArc.produced)
+
+def resetPetriNet(petriNet):
+    pass
+
+def calculateFitness(petriNet):
+    pass
+
+# Counts all tokens remaining in the Petrinet with absolute values. [-1, 1, 0] => 2 remaining tokens
+def getAllRemainingTokens(petriNet):
+    pass
+
+# Counts all tokens, that have been consumed and produced during the run of the petrinet
+def getConsumedAndProducedTokens(petrinet):
+    pass
+
 if __name__ == "__main__":    
 
     listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
@@ -190,17 +216,34 @@ if __name__ == "__main__":
     ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5")]
     ts = dict(
         t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-        t2=Transition("B", [Out(ps[1])], [In(ps[3])]),
+        t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3])]),
         t3=Transition("C", [Out(ps[2])], [In(ps[3])]), 
         t4=Transition("D", [Out(ps[3])], [In(ps[4])]),
         )
 
 
     
-    firing_sequence = ["A", "B", "C","D"] # alternative deterministic example
+    firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
     firing_sequence2 = ["A", "B", "H"]
     petri_net = PetriNet(ts)
 
     #printPetriNet(petri_net)
+    printProducedConsumed(petri_net)
     petri_net.run(firing_sequence, ps)
-    
+    printProducedConsumed(petri_net)
+
+    # logs einlesen und als variable speichern
+
+    # Petrinetz erstellen 
+    #   Random zahlen generieren für places und transitionen
+    #   Places erstellen
+    #   Transitionen erstellen
+
+    # Traces von log durch Petrinetz laufen lassen
+    #   Nach durchlauf tokens in Places zählen
+    #   Produced und consumed zählen 
+    #   Accuracy berechnen
+    #   Petrinetz resetten (consumed, produced, remaining) für nächstes trace
+
+    #   Pro durchlauf Tokenreplay accuracy speichern oder average berechnen?
+    #   
