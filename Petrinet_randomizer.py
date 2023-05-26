@@ -31,8 +31,9 @@ def createTransitions(listOfTransitions, listOfPlaces):
         listOfOut = []
         listOfIn = []
 
-        # checks if arc already exists to avoid 1-loops since most nets dont have 1-loops anyways it also improves the accuarcy of the nets
-        # Can be removed if wanted, tokenreplay also works with 1-loops
+        # checks if arc already exists to avoid 1-loops since most nets 
+        # dont have 1-loops anyways it also improves the accuarcy of the nets.
+        # Can be removed if wanted, tokenreplay also works with 1-loops.
         alreadyExists = False
         
         amountOfOutArcs = random.randint(1,4)
@@ -92,20 +93,31 @@ if __name__ == "__main__":
     
     firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
     firing_sequence2 = ["A", "B", "H"]
-    p_net = Petrinet.PetriNet(ts, ps)
+    pnet = Petrinet.PetriNet(transitions, listOfPlaces)
 
     #printPetriNet(p_net)
-    p_net.run(firing_sequence)
+    pnet.run(firing_sequence)
+    pnet.reset()
+    pnet.run(firing_sequence)
 
-    p_net.printProducedConsumed()
-    p_net.reset()
-    p_net.printProducedConsumed()
-    Generations = 100
-    Population = 100
+    print("Times run: ", pnet.timesRun)
+    print("Accuracy: " ,pnet.calcualteAccuracy())
+
+    generations = 1000
+    population = 100
     mutateRate = 0.1
     elitismRate = 0.1
 
-    Petrinets = []
+    listOfPetrinets = []
+
+    for i in range(generations):
+        for nets in range(population):
+            amountOfPlaces = len(listOfTransitions) + random.randint(0, len(listOfTransitions)/2)
+            listOfPlaces = createPlaces(amountOfPlaces)
+            transitions = createTransitions(listOfTransitions, listOfPlaces)
+            listOfPetrinets.append(Petrinet.PetriNet(transitions, listOfPlaces))
+    print(len(listOfPetrinets))
+
     # Generation 1 läuft durch, besten 10% selektieren, Rekombination, Mutation durchführen an den besten 10% und anschließend neue random Population generieren für restliche 90%
 
     # logs einlesen und als variable speichern
