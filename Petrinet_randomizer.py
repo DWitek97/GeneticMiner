@@ -1,4 +1,10 @@
 import random
+import Petrinet
+from transition import Transition
+from place import Place
+from arc import In
+from arc import Out
+
 """
 Modeling approach:
   * define Petri nets in terms of their transactions
@@ -14,122 +20,8 @@ References:
  * https://www.amazon.com/Understanding-Petri-Nets-Modeling-Techniques/dp/3642332773
 """
 
-class Place:
-    def __init__(self, holding, name):
-        """
-        Place vertex in the petri net.
-        :holding: Numer of token the place is initialized with.
-        """
-        self.name = name
-        self.holding = holding
 
-    
-class ArcBase:
-    def __init__(self, place, amount=1):
-        """
-        Arc in the petri net. 
-        :place: The one place acting as source/target of the arc as arc in the net
-        :amount: The amount of token removed/added from/to the place.
-        """
-        self.produced = 0
-        self.consumed = 0
-        self.missing = 0
-        self.place = place
-        self.amount = amount
-        
 
-class Out(ArcBase):
-    def trigger(self):
-        """
-        Remove token.
-        """
-        self.place.holding -= self.amount
-        self.consumed += 1
-
-    def non_blocking(self):
-        """
-        Validate action of outgoing arc is possible.
-        """
-        if self.place.holding >= self.amount:
-            return True
-        else:
-            self.missing +=1
-            return True 
-        
-
-class In(ArcBase):  
-    def trigger(self):
-        """
-        Add tokens.
-        """
-        self.place.holding += self.amount
-        self.produced += 1
-        
-    def non_blocking(self):
-        return self.place.holding == 0
-            
-
-class Transition:
-    def __init__(self, name, out_arcs, in_arcs):
-        """
-        Transition vertex in the petri net.
-        :name: Name of the transition.
-        :out_arcs: Collection of ingoing arcs, to the transition vertex.
-        :in_arcs: Collection of outgoing arcs, to the transition vertex.
-        """
-        self.name = name
-        self.out_arcs = out_arcs
-        self.in_arcs = in_arcs
-        
-    def fire(self):
-        """
-        Fire!
-        """  
-        outNotBlocked = all(arc.non_blocking() for arc in self.out_arcs)
-        inNotBlocked = all(arc.non_blocking() for arc in self.in_arcs)
-        # Note: This would have to be checked differently for variants of
-        # petri  nets that take more than once from a place, per transition.
-        notBlocked = outNotBlocked and inNotBlocked
-        if notBlocked:
-            for arc in self.out_arcs:
-                arc.trigger()
-            for arc in self.in_arcs:
-                arc.trigger()
-        return notBlocked # return if fired, just for the sake of debuging
-    
-
-class PetriNet:
-    def __init__(self, transitions):
-        """
-        The petri net runner.
-        :transitions: The transitions encoding the net.
-        """
-        self.transitions = transitions
-        self.fitness = 0
-    
-    def run(self, firing_sequence, ps):
-        """
-        Run the petri net.
-        Details: This is a loop over the transactions firing and then some printing.
-        :firing_sequence: Sequence of transition names use for run.
-        :ps: Place holdings to print during the run (debugging).
-        """
-        
-        print("Using firing sequence:\n" + " => ".join(firing_sequence))
-        print("start {}\n".format([p.holding for p in ps]))
-        
-        for name in firing_sequence:
-            for transition in self.transitions.values():
-                if name == transition.name:
-                    t = transition
-                    if t.fire():
-                        print(name ," fired!")
-                        print("  =>  {}".format([p.holding for p in ps]))
-                    else:
-                        print(name, " didn't fire.")
-        
-        print("\nfinal {}".format([p.holding for p in ps]))
-            
 
 def createTransitions(listOfTransitions, listOfPlaces):
     transitionsList = {}
@@ -177,43 +69,7 @@ def createPlaces(amountOfPlaces):
     return listOfPlaces
 
 
-def printPetriNet(petriNet):
-    for transition in petriNet.transitions:
-        print("Transition: ", transition)
-        for outArc in petriNet.transitions[transition].out_arcs:
-            print("Places going into Transition ", transition, " : ", outArc.place.name)
-        for inArc in petriNet.transitions[transition].in_arcs:
-            print("Places that come after Transition ", transition, " : ", inArc.place.name)
 
-def printProducedConsumed(petriNet):
-    for transition in petriNet.transitions:
-        print("Transition: ", transition)
-        for outArc in petriNet.transitions[transition].out_arcs:
-            print("Consumed ", transition, " : ", outArc.consumed)
-        for inArc in petriNet.transitions[transition].in_arcs:
-            print("Produced ", transition, " : ", inArc.produced)
-
-def resetPetriNet(petriNet, listOfPlaces):
-    for transition in petriNet.transitions:
-        for outArc in petriNet.transitions[transition].out_arcs:
-            outArc.consumed = 0
-            outArc.missing = 0
-            outArc.place.holding = 0
-        for inArc in petriNet.transitions[transition].in_arcs:
-            inArc.produced = 0
-            inArc.place.holding = 0
-    listOfPlaces[0].holding = 1
-
-def calculateFitness(petriNet):
-    pass
-
-# Counts all tokens remaining in the Petrinet with absolute values. [-1, 1, 0] => 2 remaining tokens
-def getAllRemainingTokens(petriNet):
-    pass
-
-# Gets the count of all tokens, that have been consumed and produced during the run of the petrinet
-def getConsumedAndProducedTokens(petrinet):
-    pass
 
 if __name__ == "__main__":    
 
@@ -236,15 +92,14 @@ if __name__ == "__main__":
     
     firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
     firing_sequence2 = ["A", "B", "H"]
-    petri_net = PetriNet(ts)
+    p_net = Petrinet.PetriNet(ts, ps)
 
-    #printPetriNet(petri_net)
-    petri_net.run(firing_sequence, ps)
+    #printPetriNet(p_net)
+    p_net.run(firing_sequence)
 
-    #printProducedConsumed(petri_net)
-    resetPetriNet(petri_net, ps)
-    petri_net.run(firing_sequence, ps)
-
+    p_net.printProducedConsumed()
+    p_net.reset()
+    p_net.printProducedConsumed()
     Generations = 100
     Population = 100
     mutateRate = 0.1
