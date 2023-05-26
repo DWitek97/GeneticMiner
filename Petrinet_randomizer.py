@@ -187,18 +187,20 @@ if __name__ == "__main__":
     transitions = createTransitions(listOfTransitions, listOfPlaces)
 
     #static for debugging
-    ps = [Place(1, "1"), Place(0, "2"), Place(1, "3"), Place(0, "4")]
+    ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5")]
     ts = dict(
-        t1=Transition("A", [Out(ps[0])], [In(ps[1])]), 
-        t2=Transition("B", [Out(ps[2])], [In(ps[0])]),
+        t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
+        t2=Transition("B", [Out(ps[1])], [In(ps[3])]),
+        t3=Transition("C", [Out(ps[2])], [In(ps[3])]), 
+        t4=Transition("D", [Out(ps[3])], [In(ps[4])]),
         )
 
 
     
-    firing_sequence = ["A", "B", "C", "D", "E", "F", "G", "H"] # alternative deterministic example
+    firing_sequence = ["A", "B", "C","D"] # alternative deterministic example
     firing_sequence2 = ["A", "B", "H"]
-    petri_net = PetriNet(transitions)
+    petri_net = PetriNet(ts)
 
     #printPetriNet(petri_net)
-    petri_net.run(firing_sequence2, listOfPlaces)
+    petri_net.run(firing_sequence, ps)
     
