@@ -103,7 +103,7 @@ if __name__ == "__main__":
     print("Times run: ", pnet.timesRun)
     print("Accuracy: " ,pnet.calcualteAccuracy())
 
-    generations = 1000
+    generations = 10
     population = 100
     mutateRate = 0.1
     elitismRate = 0.1
@@ -116,8 +116,9 @@ if __name__ == "__main__":
             listOfPlaces = createPlaces(amountOfPlaces)
             transitions = createTransitions(listOfTransitions, listOfPlaces)
             listOfPetrinets.append(Petrinet.PetriNet(transitions, listOfPlaces))
-    print(len(listOfPetrinets))
+    listOfPetrinets[0].printPetrinet()
 
+    listOfPetrinets[1].printPetrinet()
     # Generation 1 läuft durch, besten 10% selektieren, Rekombination, Mutation durchführen an den besten 10% und anschließend neue random Population generieren für restliche 90%
 
     # logs einlesen und als variable speichern
