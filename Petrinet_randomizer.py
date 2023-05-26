@@ -138,6 +138,9 @@ def createTransitions(listOfTransitions, listOfPlaces):
         duplicateList = []
         listOfOut = []
         listOfIn = []
+
+        # checks if arc already exists to avoid 1-loops since most nets dont have 1-loops anyways it also improves the accuarcy of the nets
+        # Can be removed if wanted, tokenreplay also works with 1-loops
         alreadyExists = False
         
         amountOfOutArcs = random.randint(1,4)
@@ -190,8 +193,16 @@ def printProducedConsumed(petriNet):
         for inArc in petriNet.transitions[transition].in_arcs:
             print("Produced ", transition, " : ", inArc.produced)
 
-def resetPetriNet(petriNet):
-    pass
+def resetPetriNet(petriNet, listOfPlaces):
+    for transition in petriNet.transitions:
+        for outArc in petriNet.transitions[transition].out_arcs:
+            outArc.consumed = 0
+            outArc.missing = 0
+            outArc.place.holding = 0
+        for inArc in petriNet.transitions[transition].in_arcs:
+            inArc.produced = 0
+            inArc.place.holding = 0
+    listOfPlaces[0].holding = 1
 
 def calculateFitness(petriNet):
     pass
@@ -200,7 +211,7 @@ def calculateFitness(petriNet):
 def getAllRemainingTokens(petriNet):
     pass
 
-# Counts all tokens, that have been consumed and produced during the run of the petrinet
+# Gets the count of all tokens, that have been consumed and produced during the run of the petrinet
 def getConsumedAndProducedTokens(petrinet):
     pass
 
@@ -228,22 +239,33 @@ if __name__ == "__main__":
     petri_net = PetriNet(ts)
 
     #printPetriNet(petri_net)
-    printProducedConsumed(petri_net)
     petri_net.run(firing_sequence, ps)
-    printProducedConsumed(petri_net)
+
+    #printProducedConsumed(petri_net)
+    resetPetriNet(petri_net, ps)
+    petri_net.run(firing_sequence, ps)
+
+    Generations = 100
+    Population = 100
+    mutateRate = 0.1
+    elitismRate = 0.1
+
+    Petrinets = []
+    # Generation 1 läuft durch, besten 10% selektieren, Rekombination, Mutation durchführen an den besten 10% und anschließend neue random Population generieren für restliche 90%
 
     # logs einlesen und als variable speichern
 
-    # Petrinetz erstellen 
-    #   Random zahlen generieren für places und transitionen
-    #   Places erstellen
-    #   Transitionen erstellen
+    # LOOP für alle Petrinetze
+        #   Petrinetz erstellen 
+        #   Random zahlen generieren für places und transitionen
+        #   Places erstellen
+        #   Transitionen erstellen
 
-    # Traces von log durch Petrinetz laufen lassen
-    #   Nach durchlauf tokens in Places zählen
-    #   Produced und consumed zählen 
-    #   Accuracy berechnen
-    #   Petrinetz resetten (consumed, produced, remaining) für nächstes trace
-
-    #   Pro durchlauf Tokenreplay accuracy speichern oder average berechnen?
-    #   
+        # LOOP für ein Petrinetz
+            #   Traces von log durch Petrinetz laufen lassen
+            #   Nach durchlauf tokens in Places zählen
+            #   Produced und consumed zählen 
+            #   Accuracy berechnen
+            #   Petrinetz resetten (consumed, produced, remaining) für nächstes trace
+            #   Pro durchlauf Tokenreplay accuracy speichern oder average berechnen?
+       
