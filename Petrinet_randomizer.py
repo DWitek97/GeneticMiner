@@ -78,7 +78,7 @@ def crossCombine(petriNet1, petriNet2):
 
 def initializeStartingPopulation(populationSize, allActivies):
     for i in range(populationSize):
-        amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies))/2)
+        amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies)/2))
         listOfPlaces = createPlaces(amountOfPlaces)
         transitions = createTransitions(allActivies, listOfPlaces)
         listOfPetrinets.append(PetriNet(transitions, listOfPlaces))
@@ -94,7 +94,7 @@ if __name__ == "__main__":
     reader = logreader()
     traces = reader.readLogs(csv_datei)
     allActivities = reader.getAllActivities()
-
+    print(allActivities)
     # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
     amountOfPlaces = len(allActivities) + random.randint(0, round(len(allActivities)/2))
@@ -117,11 +117,11 @@ if __name__ == "__main__":
     # pnet.reset()
     # pnet.run(firing_sequence)
     # print("Times run: ", pnet.timesRun)
-    # print("Accuracy: " ,pnet.calcualteAccuracy())
+    # print("Accuracy: " ,pnet.accuracy)
 
     #################### static for debugging ###########################################
 
-    generations = 3
+    generations = 1
     populationSize = 100
     mutateRate = 0.1
     elitismRate = 0.1
@@ -131,14 +131,16 @@ if __name__ == "__main__":
     initializeStartingPopulation(populationSize, allActivities)
 
     # run tokenreplay of all traces for every net
-    # for i in range(generations):
-    #     for petriNet in listOfPetrinets:
-    #         for trace in traces:
-    #             petriNet.run(trace)
-    # for net in listOfPetrinets:
-    #     print(net.accuracy)
+    for i in range(generations):
+        for petriNet in listOfPetrinets:
+            for trace in traces:
+                petriNet.run(trace)
+                petriNet.reset()
+    for net in listOfPetrinets:
+        if net.accuracy > 0.01:
+            print("{:.2f}".format(net.accuracy))
     
-    
+
 
     # Generation 1 läuft durch, besten 10% selektieren, Rekombination, Mutation durchführen an den besten 10% und anschließend neue random Population generieren für restliche 90%
 

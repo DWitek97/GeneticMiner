@@ -71,7 +71,7 @@ class PetriNet():
             result = (correct - difference)/correct
         else:
             result = 0
-        self.accuarcy = (self.accuracy * self.timesRun + result)/self.timesRun
+        self.accuracy = (self.accuracy + result)/2
 
     # Counts all tokens remaining in the self with absolute values. [-1, 1, 0] => 2 remaining tokens
     def getAllRemainingTokens(self):
