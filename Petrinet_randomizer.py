@@ -1,5 +1,6 @@
 import random
-import Petrinet
+from logReader import logreader
+from Petrinet import PetriNet
 from transition import Transition
 from place import Place
 from arc import In
@@ -69,56 +70,76 @@ def createPlaces(amountOfPlaces):
         listOfPlaces.append(Place(0, i + 1))
     return listOfPlaces
 
+def mutate(petriNet):
+    pass
 
+def crossCombine(petriNet1, petriNet2):
+    pass
+
+def initializeStartingPopulation(populationSize, allActivies):
+    for i in range(populationSize):
+        amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies))/2)
+        listOfPlaces = createPlaces(amountOfPlaces)
+        transitions = createTransitions(allActivies, listOfPlaces)
+        listOfPetrinets.append(PetriNet(transitions, listOfPlaces))
+    
+
+def initializeNewPopulation():
+    pass
 
 
 if __name__ == "__main__":    
 
-    listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
+    csv_datei = "Log.csv"
+    reader = logreader()
+    traces = reader.readLogs(csv_datei)
+    allActivities = reader.getAllActivities()
 
-    amountOfPlaces = len(listOfTransitions) + random.randint(0, len(listOfTransitions)/2)
+    # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
+
+    amountOfPlaces = len(allActivities) + random.randint(0, round(len(allActivities)/2))
     listOfPlaces = createPlaces(amountOfPlaces)
-    transitions = createTransitions(listOfTransitions, listOfPlaces)
+    transitions = createTransitions(allActivities, listOfPlaces)
 
-    #static for debugging
-    ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5")]
-    ts = dict(
-        t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-        t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3])]),
-        t3=Transition("C", [Out(ps[2])], [In(ps[3])]), 
-        t4=Transition("D", [Out(ps[3])], [In(ps[4])]),
-        )
+    #################### static for debugging ###########################################
 
+    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5")]
+    # ts = dict(
+    #     t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
+    #     t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3])]),
+    #     t3=Transition("C", [Out(ps[2])], [In(ps[3])]), 
+    #     t4=Transition("D", [Out(ps[3])], [In(ps[4])]),
+    #     )
 
-    
-    firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
-    firing_sequence2 = ["A", "B", "H"]
-    pnet = Petrinet.PetriNet(transitions, listOfPlaces)
+    # firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
+    # pnet = PetriNet(ts, ps)
+    # pnet.run(firing_sequence)
+    # pnet.reset()
+    # pnet.run(firing_sequence)
+    # print("Times run: ", pnet.timesRun)
+    # print("Accuracy: " ,pnet.calcualteAccuracy())
 
-    #printPetriNet(p_net)
-    pnet.run(firing_sequence)
-    pnet.reset()
-    pnet.run(firing_sequence)
+    #################### static for debugging ###########################################
 
-    print("Times run: ", pnet.timesRun)
-    print("Accuracy: " ,pnet.calcualteAccuracy())
-
-    generations = 10
-    population = 100
+    generations = 3
+    populationSize = 100
     mutateRate = 0.1
     elitismRate = 0.1
 
     listOfPetrinets = []
 
-    for i in range(generations):
-        for nets in range(population):
-            amountOfPlaces = len(listOfTransitions) + random.randint(0, len(listOfTransitions)/2)
-            listOfPlaces = createPlaces(amountOfPlaces)
-            transitions = createTransitions(listOfTransitions, listOfPlaces)
-            listOfPetrinets.append(Petrinet.PetriNet(transitions, listOfPlaces))
-    listOfPetrinets[0].printPetrinet()
+    initializeStartingPopulation(populationSize, allActivities)
 
-    listOfPetrinets[1].printPetrinet()
+    # run tokenreplay of all traces for every net
+    # for i in range(generations):
+    #     for petriNet in listOfPetrinets:
+    #         for trace in traces:
+    #             petriNet.run(trace)
+    # for net in listOfPetrinets:
+    #     print(net.accuracy)
+    
+    
+
     # Generation 1 läuft durch, besten 10% selektieren, Rekombination, Mutation durchführen an den besten 10% und anschließend neue random Population generieren für restliche 90%
 
     # logs einlesen und als variable speichern

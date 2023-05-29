@@ -30,8 +30,9 @@ class PetriNet():
                         print("  =>  {}".format([p.holding for p in self.places]))
                     else:
                         print(name, " didn't fire.")
-        
+        self.calcualteAccuracy()
         print("\nfinal {}".format([p.holding for p in self.places]))
+        
 
     def printPetrinet(self):
         for transition in self.transitions:
@@ -66,9 +67,11 @@ class PetriNet():
     def calcualteAccuracy(self):
         correct = self.getConsumedAndProducedTokens()
         difference = self.getAllRemainingTokens()
-        result = (correct - difference)/correct
+        if correct != 0:
+            result = (correct - difference)/correct
+        else:
+            result = 0
         self.accuarcy = (self.accuracy * self.timesRun + result)/self.timesRun
-        return self.accuracy
 
     # Counts all tokens remaining in the self with absolute values. [-1, 1, 0] => 2 remaining tokens
     def getAllRemainingTokens(self):
