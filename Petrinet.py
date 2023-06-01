@@ -1,4 +1,6 @@
-
+import random
+from arc import In
+from arc import Out
 class PetriNet():
     def __init__(self, transitions, places):
         """
@@ -90,3 +92,36 @@ class PetriNet():
             for inArc in self.transitions[transition].in_arcs:
                 sum += inArc.produced        
         return sum
+    
+    def mutate(self):
+        for i in range(0, random.randint(1,3)):
+            n = random.randint(0,2)
+
+            # add place
+            if n == 0:
+                print("ADDING PLACE")
+                t_index = random.randint(0, len(self.transitions) - 1)
+                out_or_in = random.randint(0,1)
+                if out_or_in == 0:
+                    p_index = random.randint(0, len(self.places) - 1)
+                    # needed because transitions is a dict, p_index is fine because places is list type
+                    Tkey = list(self.transitions)[t_index]
+                    self.transitions[Tkey].out_arcs.append(Out(self.places[p_index]))
+                else:
+                    p_index = random.randint(0, len(self.places) - 1)
+                    Tkey = list(self.transitions)[t_index]
+                    self.transitions[Tkey].in_arcs.append(In(self.places[p_index]))
+
+            # delete place
+            elif n == 1:
+                print("DELETING PLACE")
+                t_index = random.randint(0, len(self.transitions) - 1)
+                out_or_in = random.randint(0,1)
+                if out_or_in == 0:
+                    Tkey = list(self.transitions)[t_index]
+                    if len(self.transitions[Tkey].out_arcs) == 0:
+                        self.transitions[Tkey].out_arcs.pop()
+                else:
+                    Tkey = list(self.transitions)[t_index]
+                    if len(self.transitions[Tkey].out_arcs) == 0:
+                        self.transitions[Tkey].in_arcs.pop()

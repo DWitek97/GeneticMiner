@@ -70,8 +70,8 @@ def createPlaces(amountOfPlaces):
         listOfPlaces.append(Place(0, i + 1))
     return listOfPlaces
 
-def mutate(petriNet):
-    pass
+
+
 
 def crossCombine(petriNet1, petriNet2):
     pass
@@ -90,7 +90,7 @@ def initializeNewPopulation():
 
 if __name__ == "__main__":    
 
-    csv_datei = "Log.csv"
+    csv_datei = "Log copy.csv"
     reader = logreader()
     traces = reader.readLogs(csv_datei)
     allActivities = reader.getAllActivities()
@@ -122,7 +122,7 @@ if __name__ == "__main__":
     #################### static for debugging ###########################################
 
     generations = 1
-    populationSize = 100
+    populationSize = 1
     mutateRate = 0.1
     elitismRate = 0.1
 
@@ -134,7 +134,10 @@ if __name__ == "__main__":
     for i in range(generations):
         for petriNet in listOfPetrinets:
             for trace in traces:
-                petriNet.run(trace)
+                #petriNet.run(trace)
+                petriNet.printPetrinet()
+                petriNet.mutate()
+                petriNet.printPetrinet()
                 petriNet.reset()
     for net in listOfPetrinets:
         if net.accuracy > 0.01:
