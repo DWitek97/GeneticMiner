@@ -9,6 +9,7 @@ class PetriNet():
         """
         self.transitions = transitions
         self.places = places
+        self.fitness = 0
         self.accuracy = 0.01 # average accuracy from tokenreplay, not 0 becuase algorithm would divide by 0
         self.timesRun = 0 # times tokenreplay was run to calculate average accuracy
     
@@ -64,7 +65,7 @@ class PetriNet():
         self.places[0].holding = 1
 
     def calculateFitness(self):
-        pass
+        self.fitness = self.accuracy / self.timesRun
 
     def calcualteAccuracy(self):
         correct = self.getConsumedAndProducedTokens()
@@ -73,7 +74,7 @@ class PetriNet():
             result = (correct - difference)/correct
         else:
             result = 0
-        self.accuracy = (self.accuracy + result)/2
+        self.accuracy = self.accuracy + result
 
     # Counts all tokens remaining in the self with absolute values. [-1, 1, 0] => 2 remaining tokens
     def getAllRemainingTokens(self):
