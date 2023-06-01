@@ -53,7 +53,7 @@ class PetriNet():
             for inArc in self.transitions[transition].in_arcs:
                 print("Produced ", transition, " : ", inArc.produced)
 
-    def reset(self):
+    def resetTokens(self):
         for transition in self.transitions:
             for outArc in self.transitions[transition].out_arcs:
                 outArc.consumed = 0
@@ -63,6 +63,20 @@ class PetriNet():
                 inArc.produced = 0
                 inArc.place.holding = 0
         self.places[0].holding = 1
+
+    def resetAll(self):
+        for transition in self.transitions:
+            for outArc in self.transitions[transition].out_arcs:
+                outArc.consumed = 0
+                outArc.missing = 0
+                outArc.place.holding = 0
+            for inArc in self.transitions[transition].in_arcs:
+                inArc.produced = 0
+                inArc.place.holding = 0
+        self.places[0].holding = 1
+        self.accuracy = 0.01
+        self.fitness = 0
+        self.timesRun = 0
 
     def calculateFitness(self):
         self.fitness = self.accuracy / self.timesRun

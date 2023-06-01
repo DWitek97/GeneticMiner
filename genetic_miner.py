@@ -114,7 +114,7 @@ if __name__ == "__main__":
     # firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
     # pnet = PetriNet(ts, ps)
     # pnet.run(firing_sequence)
-    # pnet.reset()
+    # pnet.resetTokens()
     # pnet.run(firing_sequence)
     # print("Times run: ", pnet.timesRun)
     # print("Accuracy: " ,pnet.accuracy)
@@ -136,7 +136,7 @@ if __name__ == "__main__":
             for trace in traces:
                 petriNet.run(trace)
                 petriNet.mutate()
-                petriNet.reset()
+                petriNet.resetTokens()
     for net in listOfPetrinets:
         net.calculateFitness()
         if net.fitness > 0.01:
