@@ -11,7 +11,7 @@ class PetriNet():
         self.places = places
         self.fitness = 0
         self.accuracy = 0.01 # average accuracy from tokenreplay, not 0 becuase algorithm would divide by 0
-        self.timesRun = 0 # times tokenreplay was run to calculate average accuracy
+        self.timesRun = 1 # times tokenreplay was run to calculate average accuracy
     
     def run(self, firing_sequence):
         """
@@ -76,7 +76,7 @@ class PetriNet():
         self.places[0].holding = 1
         self.accuracy = 0.01
         self.fitness = 0
-        self.timesRun = 0
+        self.timesRun = 1
 
     def calculateFitness(self):
         self.fitness = self.accuracy / self.timesRun

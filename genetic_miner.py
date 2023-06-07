@@ -22,125 +22,121 @@ References:
 """
 
 
+class geneticMiner():
 
+    def __init__(self):
+        self.allActivities = None
+        self.generations = 1
+        self.populationSize = 100
+        self.mutateRate = 0.1
+        self.elitismRate = 0.1
+        self.listOfPetrinets = []
 
-def createTransitions(listOfTransitions, listOfPlaces):
-    transitionsList = {}
-    for transition in listOfTransitions:
-        
-        duplicateList = []
-        listOfOut = []
+    def createTransitions(self, listOfTransitions, listOfPlaces):
+        transitionsList = {}
+        for transition in listOfTransitions:
+            
+            duplicateList = []
+            listOfOut = []
+            listOfIn = []
+
+            # checks if arc already exists to avoid 1-loops since most nets 
+            # dont have 1-loops anyways it also improves the accuarcy of the nets.
+            # Can be removed if wanted, tokenreplay also works with 1-loops.
+            alreadyExists = False
+            
+            amountOfOutArcs = random.randint(1,4)
+            amountOfInArcs = random.randint(1,4)
+
+            for i in range(amountOfOutArcs):
+                index = random.randint(0, len(listOfPlaces) -1 )
+                for outArc in duplicateList:
+                    if listOfPlaces[index].name == outArc.place.name:
+                        alreadyExists = True
+                if not alreadyExists:
+                    duplicateList.append(Out(listOfPlaces[index]))
+                    listOfOut.append(Out(listOfPlaces[index]))
+                alreadyExists = False
+
+            for i in range(amountOfInArcs):
+                index = random.randint(0, len(listOfPlaces) -1 )
+                for inArc in duplicateList:
+                    if listOfPlaces[index].name == inArc.place.name:
+                        alreadyExists = True
+                if not alreadyExists:
+                    duplicateList.append(In(listOfPlaces[index]))
+                    listOfIn.append(In(listOfPlaces[index]))
+                alreadyExists = False
+
+            transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
+
+        return transitionsList
+
+    def createPlaces(self, amountOfPlaces):
+        listOfPlaces = [Place(1,"1")]
+        for i in range(amountOfPlaces):
+            listOfPlaces.append(Place(0, i + 1))
+        return listOfPlaces
+
+    def crossCombine(self, petriNet1, petriNet2):
+        places = self.createPlaces(len(petriNet1.places))
         listOfIn = []
+        listOfOut = []
+        transitionList = []
+        for tr in petriNet1.transitions.values():
+            for outArc in tr.out_arcs:
+                listOfOut.append(Out(places[int(outArc.place.name)]))
+            for inArc in tr.in_arcs:
+                listOfIn.append(In(places[int(inArc.place.name)]))
+            transitionList.append(Transition(tr.name, listOfOut, listOfIn))
+    
+    
+        # neue places erstellen
+        # out und in arcs anschauen und nachbauen?
+        return transitionList
 
-        # checks if arc already exists to avoid 1-loops since most nets 
-        # dont have 1-loops anyways it also improves the accuarcy of the nets.
-        # Can be removed if wanted, tokenreplay also works with 1-loops.
-        alreadyExists = False
-        
-        amountOfOutArcs = random.randint(1,4)
-        amountOfInArcs = random.randint(1,4)
-
-        for i in range(amountOfOutArcs):
-            index = random.randint(0, len(listOfPlaces) -1 )
-            for outArc in duplicateList:
-                if listOfPlaces[index].name == outArc.place.name:
-                    alreadyExists = True
-            if not alreadyExists:
-                duplicateList.append(Out(listOfPlaces[index]))
-                listOfOut.append(Out(listOfPlaces[index]))
-            alreadyExists = False
-
-        for i in range(amountOfInArcs):
-            index = random.randint(0, len(listOfPlaces) -1 )
-            for inArc in duplicateList:
-                if listOfPlaces[index].name == inArc.place.name:
-                    alreadyExists = True
-            if not alreadyExists:
-                duplicateList.append(In(listOfPlaces[index]))
-                listOfIn.append(In(listOfPlaces[index]))
-            alreadyExists = False
-
-        transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
-
-    return transitionsList
-
-def createPlaces(amountOfPlaces):
-    listOfPlaces = [Place(1,"1")]
-    for i in range(amountOfPlaces):
-        listOfPlaces.append(Place(0, i + 1))
-    return listOfPlaces
-
-
-
-
-def crossCombine(petriNet1, petriNet2):
-    pass
-
-def initializeStartingPopulation(populationSize, allActivies):
-    for i in range(populationSize):
-        amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies)/2))
-        listOfPlaces = createPlaces(amountOfPlaces)
-        transitions = createTransitions(allActivies, listOfPlaces)
-        listOfPetrinets.append(PetriNet(transitions, listOfPlaces))
+    def initializeStartingPopulation(self, populationSize, allActivies):
+        for i in range(populationSize):
+            amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies)/2))
+            listOfPlaces = self.createPlaces(amountOfPlaces)
+            transitions = self.createTransitions(allActivies, listOfPlaces)
+            self.listOfPetrinets.append(PetriNet(transitions, listOfPlaces))
     
 
-def initializeNewPopulation():
-    pass
+    def initializeNewPopulation(self):
+        pass
 
+    def main(self):
+        csv_datei = "Log.csv"
+        reader = logreader()
+        traces = reader.readLogs(csv_datei)
+        self.allActivities = reader.getAllActivities()
+        print(self.allActivities)
+        # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
+
+        amountOfPlaces = len(self.allActivities) + random.randint(0, round(len(self.allActivities)/2))
+        listOfPlaces = self.createPlaces(amountOfPlaces)
+        transitions = self.createTransitions(self.allActivities, listOfPlaces)
+
+        self.initializeStartingPopulation(self.populationSize, self.allActivities)
+
+        # run tokenreplay of all traces for every net
+        for i in range(self.generations):
+            for petriNet in self.listOfPetrinets:
+                for trace in traces:
+                    #petriNet.run(trace)
+                    #petriNet.mutate()
+                    petriNet.resetTokens()
+                    self.crossCombine(self.listOfPetrinets[0], self.listOfPetrinets[1])
+        for net in self.listOfPetrinets:
+            net.calculateFitness()
+            if net.fitness > 0.01:
+                print("{:.2f}".format(net.fitness))
 
 if __name__ == "__main__":    
-
-    csv_datei = "Log.csv"
-    reader = logreader()
-    traces = reader.readLogs(csv_datei)
-    allActivities = reader.getAllActivities()
-    print(allActivities)
-    # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
-
-    amountOfPlaces = len(allActivities) + random.randint(0, round(len(allActivities)/2))
-    listOfPlaces = createPlaces(amountOfPlaces)
-    transitions = createTransitions(allActivities, listOfPlaces)
-
-    #################### static for debugging ###########################################
-
-    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5")]
-    # ts = dict(
-    #     t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-    #     t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3])]),
-    #     t3=Transition("C", [Out(ps[2])], [In(ps[3])]), 
-    #     t4=Transition("D", [Out(ps[3])], [In(ps[4])]),
-    #     )
-
-    # firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
-    # pnet = PetriNet(ts, ps)
-    # pnet.run(firing_sequence)
-    # pnet.resetTokens()
-    # pnet.run(firing_sequence)
-    # print("Times run: ", pnet.timesRun)
-    # print("Accuracy: " ,pnet.accuracy)
-
-    #################### static for debugging ###########################################
-
-    generations = 1
-    populationSize = 100
-    mutateRate = 0.1
-    elitismRate = 0.1
-
-    listOfPetrinets = []
-
-    initializeStartingPopulation(populationSize, allActivities)
-
-    # run tokenreplay of all traces for every net
-    for i in range(generations):
-        for petriNet in listOfPetrinets:
-            for trace in traces:
-                petriNet.run(trace)
-                petriNet.mutate()
-                petriNet.resetTokens()
-    for net in listOfPetrinets:
-        net.calculateFitness()
-        if net.fitness > 0.01:
-            print("{:.2f}".format(net.fitness))
+    miner = geneticMiner()
+    miner.main()
+    
     
 
 
@@ -161,4 +157,23 @@ if __name__ == "__main__":
             #   Accuracy berechnen
             #   Petrinetz resetten (consumed, produced, remaining) für nächstes trace
             #   Pro durchlauf Tokenreplay accuracy speichern oder average berechnen?
-       
+
+   #################### static for debugging ###########################################
+
+    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5")]
+    # ts = dict(
+    #     t1=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
+    #     t2=Transition("B", [Out(ps[1]), Out(ps[2])], [In(ps[3])]),
+    #     t3=Transition("C", [Out(ps[2])], [In(ps[3])]), 
+    #     t4=Transition("D", [Out(ps[3])], [In(ps[4])]),
+    #     )
+
+    # firing_sequence = ["A", "B", "D", "C"] # alternative deterministic example
+    # pnet = PetriNet(ts, ps)
+    # pnet.run(firing_sequence)
+    # pnet.resetTokens()
+    # pnet.run(firing_sequence)
+    # print("Times run: ", pnet.timesRun)
+    # print("Accuracy: " ,pnet.accuracy)
+
+    #################### static for debugging ###########################################
