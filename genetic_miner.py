@@ -79,7 +79,7 @@ class geneticMiner():
                 listOfPlaces.append(Place(0, i + 1))
         return listOfPlaces
 
-    def crossCombine(self, petriNet1, petriNet2):
+    def crossOver(self, petriNet1, petriNet2):
         if len(petriNet1.places) < len(petriNet2.places):
             places = self.createPlaces(len(petriNet2.places))
         else:
@@ -162,7 +162,7 @@ class geneticMiner():
                     petriNet.printPetrinet()
                     #petriNet.mutate()
                     petriNet.resetTokens()
-                net = self.crossCombine(self.listOfPetrinets[0], self.listOfPetrinets[1])
+                net = self.crossOver(self.listOfPetrinets[0], self.listOfPetrinets[1])
             #net.printPetrinet()
         for net in self.listOfPetrinets:
             net.calculateFitness()
