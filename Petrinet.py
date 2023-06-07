@@ -41,9 +41,11 @@ class PetriNet():
         for transition in self.transitions:
             print("Transition: ", transition)
             for outArc in self.transitions[transition].out_arcs:
-                print("Places going into Transition ", transition, " : ", outArc.place.name)
+                print(outArc.place.name," -> ", transition)
+            print()
             for inArc in self.transitions[transition].in_arcs:
-                print("Places that come after Transition ", transition, " : ", inArc.place.name)
+                print(transition, " -> ", inArc.place.name)
+            print()
 
     def printProducedConsumed(self):
         for transition in self.transitions:

@@ -27,7 +27,7 @@ class geneticMiner():
     def __init__(self):
         self.allActivities = None
         self.generations = 1
-        self.populationSize = 100
+        self.populationSize = 2
         self.mutateRate = 0.1
         self.elitismRate = 0.1
         self.listOfPetrinets = []
@@ -73,23 +73,57 @@ class geneticMiner():
         return transitionsList
 
     def createPlaces(self, amountOfPlaces):
-        listOfPlaces = [Place(1,"1")]
+        listOfPlaces = [Place(1,1)]
         for i in range(amountOfPlaces):
-            listOfPlaces.append(Place(0, i + 1))
+            if i > 0:
+                listOfPlaces.append(Place(0, i + 1))
         return listOfPlaces
 
     def crossCombine(self, petriNet1, petriNet2):
-        places = self.createPlaces(len(petriNet1.places))
+        if len(petriNet1.places) < len(petriNet2.places):
+            places = self.createPlaces(len(petriNet2.places))
+        else:
+            places = self.createPlaces(len(petriNet1.places))
         listOfIn = []
         listOfOut = []
-        transitionList = []
-        for tr in petriNet1.transitions.values():
-            for outArc in tr.out_arcs:
-                listOfOut.append(Out(places[int(outArc.place.name)]))
-            for inArc in tr.in_arcs:
-                listOfIn.append(In(places[int(inArc.place.name)]))
-            transitionList.append(Transition(tr.name, listOfOut, listOfIn))
-    
+        transitionList = {}
+        complete = False
+        while not complete:
+            i = random.randint(0, len(self.allActivities) - 1)
+            if i % 2 == 0:
+                Tkey = list(petriNet1.transitions)[i]
+                if Tkey not in transitionList:
+                    for outArc in petriNet1.transitions[Tkey].out_arcs:
+
+                        listOfOut.append(Out(places[int(outArc.place.name) - 1]))
+                    for inArc in petriNet1.transitions[Tkey].in_arcs:
+                        listOfIn.append(In(places[int(inArc.place.name) - 1]))
+                    transitionList[Tkey] = (Transition(Tkey, listOfOut, listOfIn))
+                else:
+                    pass
+            else:
+                Tkey = list(petriNet2.transitions)[i]
+                if Tkey not in transitionList:
+                    for outArc in petriNet2.transitions[Tkey].out_arcs:
+                        listOfOut.append(Out(places[int(outArc.place.name) - 1]))
+                    for inArc in petriNet2.transitions[Tkey].in_arcs:
+                        listOfIn.append(In(places[int(inArc.place.name) - 1]))
+                    transitionList[Tkey] = (Transition(Tkey, listOfOut, listOfIn))
+                else:
+                    pass
+            complete = True
+            for char in self.allActivities:
+                if char not in transitionList:
+                    complete = False
+        return PetriNet(transitionList, places)
+
+        # for tr in petriNet1.transitions.values():
+        #     for outArc in tr.out_arcs:
+        #         listOfOut.append(Out(places[int(outArc.place.name)]))
+        #     for inArc in tr.in_arcs:
+        #         listOfIn.append(In(places[int(inArc.place.name)]))
+        #     transitionList.append(Transition(tr.name, listOfOut, listOfIn))
+        
     
         # neue places erstellen
         # out und in arcs anschauen und nachbauen?
@@ -111,7 +145,7 @@ class geneticMiner():
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
-        print(self.allActivities)
+        #print(self.allActivities)
         # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
         amountOfPlaces = len(self.allActivities) + random.randint(0, round(len(self.allActivities)/2))
@@ -124,10 +158,12 @@ class geneticMiner():
         for i in range(self.generations):
             for petriNet in self.listOfPetrinets:
                 for trace in traces:
-                    #petriNet.run(trace)
+                    petriNet.run(trace)
+                    petriNet.printPetrinet()
                     #petriNet.mutate()
                     petriNet.resetTokens()
-                    self.crossCombine(self.listOfPetrinets[0], self.listOfPetrinets[1])
+                net = self.crossCombine(self.listOfPetrinets[0], self.listOfPetrinets[1])
+            #net.printPetrinet()
         for net in self.listOfPetrinets:
             net.calculateFitness()
             if net.fitness > 0.01:
