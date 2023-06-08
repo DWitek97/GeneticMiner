@@ -26,10 +26,11 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 1
-        self.populationSize = 2
+        self.generations = 3
+        self.populationSize = 100
         self.mutateRate = 0.1
         self.elitismRate = 0.1
+        self.crossOverRate = 0.1
         self.listOfPetrinets = []
 
     def createTransitions(self, listOfTransitions, listOfPlaces):
@@ -89,8 +90,9 @@ class geneticMiner():
         transitionList = {}
         complete = False
         while not complete:
+            n = random.randint(0,1)
             i = random.randint(0, len(self.allActivities) - 1)
-            if i % 2 == 0:
+            if n == 0:
                 Tkey = list(petriNet1.transitions)[i]
                 if Tkey not in transitionList:
                     for outArc in petriNet1.transitions[Tkey].out_arcs:
@@ -117,18 +119,6 @@ class geneticMiner():
                     complete = False
         return PetriNet(transitionList, places)
 
-        # for tr in petriNet1.transitions.values():
-        #     for outArc in tr.out_arcs:
-        #         listOfOut.append(Out(places[int(outArc.place.name)]))
-        #     for inArc in tr.in_arcs:
-        #         listOfIn.append(In(places[int(inArc.place.name)]))
-        #     transitionList.append(Transition(tr.name, listOfOut, listOfIn))
-        
-    
-        # neue places erstellen
-        # out und in arcs anschauen und nachbauen?
-        return transitionList
-
     def initializeStartingPopulation(self, populationSize, allActivies):
         for i in range(populationSize):
             amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies)/2))
@@ -139,6 +129,14 @@ class geneticMiner():
 
     def initializeNewPopulation(self):
         pass
+
+    def doCrossOver(self, bestIndividuals):
+        listOfOffspring = []
+        for i in range(0, int(self.populationSize * self.crossOverRate)):
+            n = random.randint(0, len(bestIndividuals) - 1)
+            m = random.randint(0, len(bestIndividuals) - 1)
+            listOfOffspring.append(self.crossOver(bestIndividuals[n], bestIndividuals[m]))
+        return listOfOffspring
 
     def main(self):
         csv_datei = "Log.csv"
@@ -159,15 +157,20 @@ class geneticMiner():
             for petriNet in self.listOfPetrinets:
                 for trace in traces:
                     petriNet.run(trace)
-                    petriNet.printPetrinet()
-                    #petriNet.mutate()
                     petriNet.resetTokens()
-                net = self.crossOver(self.listOfPetrinets[0], self.listOfPetrinets[1])
-            #net.printPetrinet()
-        for net in self.listOfPetrinets:
-            net.calculateFitness()
-            if net.fitness > 0.01:
-                print("{:.2f}".format(net.fitness))
+                petriNet.calculateFitness()
+            self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
+            bestIndividuals = self.listOfPetrinets[:int(self.populationSize * self.elitismRate)]
+            offspring = self.doCrossOver(bestIndividuals)
+            for i in range(0, int(len(offspring) * self.mutateRate)):
+                n = random.randint(0, len(offspring) - 1)
+                offspring[n].mutate()
+            self.listOfPetrinets.clear()
+            self.listOfPetrinets.extend(bestIndividuals)
+            self.listOfPetrinets.extend(offspring)
+            print(len(self.listOfPetrinets))
+        # for net in self.listOfPetrinets:
+        #     print("{:.2f}".format(net.fitness))
 
 if __name__ == "__main__":    
     miner = geneticMiner()

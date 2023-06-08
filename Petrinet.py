@@ -116,7 +116,6 @@ class PetriNet():
 
             # add place
             if n == 0:
-                print("ADDING PLACE")
                 t_index = random.randint(0, len(self.transitions) - 1)
                 out_or_in = random.randint(0,1)
                 if out_or_in == 0:
@@ -131,7 +130,6 @@ class PetriNet():
 
             # delete place
             elif n == 1:
-                print("DELETING PLACE")
                 t_index = random.randint(0, len(self.transitions) - 1)
                 out_or_in = random.randint(0,1)
                 if out_or_in == 0:
