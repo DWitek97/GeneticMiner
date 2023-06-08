@@ -26,8 +26,8 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 3
-        self.populationSize = 100
+        self.generations = 10000
+        self.populationSize = 1000
         self.mutateRate = 0.1
         self.elitismRate = 0.1
         self.crossOverRate = 0.1
@@ -85,18 +85,18 @@ class geneticMiner():
             places = self.createPlaces(len(petriNet2.places))
         else:
             places = self.createPlaces(len(petriNet1.places))
-        listOfIn = []
-        listOfOut = []
+
         transitionList = {}
         complete = False
         while not complete:
+            listOfIn = []
+            listOfOut = []
             n = random.randint(0,1)
             i = random.randint(0, len(self.allActivities) - 1)
             if n == 0:
                 Tkey = list(petriNet1.transitions)[i]
                 if Tkey not in transitionList:
                     for outArc in petriNet1.transitions[Tkey].out_arcs:
-
                         listOfOut.append(Out(places[int(outArc.place.name) - 1]))
                     for inArc in petriNet1.transitions[Tkey].in_arcs:
                         listOfIn.append(In(places[int(inArc.place.name) - 1]))
@@ -119,16 +119,20 @@ class geneticMiner():
                     complete = False
         return PetriNet(transitionList, places)
 
-    def initializeStartingPopulation(self, populationSize, allActivies):
-        for i in range(populationSize):
-            amountOfPlaces = len(allActivies) + random.randint(0, round(len(allActivies)/2))
+    def initializeStartingPopulation(self):
+        for i in range(self.populationSize):
+            amountOfPlaces = len(self.allActivities) + random.randint(0, round(len(self.allActivities)/2))
             listOfPlaces = self.createPlaces(amountOfPlaces)
-            transitions = self.createTransitions(allActivies, listOfPlaces)
+            transitions = self.createTransitions(self.allActivities, listOfPlaces)
             self.listOfPetrinets.append(PetriNet(transitions, listOfPlaces))
     
-
-    def initializeNewPopulation(self):
-        pass
+    def initializeNextPopulation(self, bestindivduals, offspring):
+        newPopulation = self.populationSize - bestindivduals - offspring
+        for i in range(0, newPopulation):
+            amountOfPlaces = len(self.allActivities) + random.randint(0, round(len(self.allActivities)/2))
+            listOfPlaces = self.createPlaces(amountOfPlaces)
+            transitions = self.createTransitions(self.allActivities, listOfPlaces)
+            self.listOfPetrinets.append(PetriNet(transitions, listOfPlaces))  
 
     def doCrossOver(self, bestIndividuals):
         listOfOffspring = []
@@ -150,25 +154,34 @@ class geneticMiner():
         listOfPlaces = self.createPlaces(amountOfPlaces)
         transitions = self.createTransitions(self.allActivities, listOfPlaces)
 
-        self.initializeStartingPopulation(self.populationSize, self.allActivities)
+        self.initializeStartingPopulation()
 
         # run tokenreplay of all traces for every net
-        for i in range(self.generations):
+        for generation in range(self.generations):
+            for net in self.listOfPetrinets:
+                net.resetAll()
             for petriNet in self.listOfPetrinets:
                 for trace in traces:
                     petriNet.run(trace)
                     petriNet.resetTokens()
                 petriNet.calculateFitness()
+
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
             bestIndividuals = self.listOfPetrinets[:int(self.populationSize * self.elitismRate)]
             offspring = self.doCrossOver(bestIndividuals)
+
             for i in range(0, int(len(offspring) * self.mutateRate)):
                 n = random.randint(0, len(offspring) - 1)
                 offspring[n].mutate()
+
             self.listOfPetrinets.clear()
             self.listOfPetrinets.extend(bestIndividuals)
             self.listOfPetrinets.extend(offspring)
-            print(len(self.listOfPetrinets))
+            self.initializeNextPopulation(len(bestIndividuals), len(offspring))
+
+        self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
+        self.listOfPetrinets[0].printPetrinet()
+        print(self.listOfPetrinets[0].fitness)
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 

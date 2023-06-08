@@ -21,20 +21,22 @@ class PetriNet():
         :ps: Place holdings to print during the run (debugging).
         """
         self.timesRun += 1
-        print("Using firing sequence:\n" + " => ".join(firing_sequence))
-        print("start {}\n".format([p.holding for p in self.places]))
+        #print("Using firing sequence:\n" + " => ".join(firing_sequence))
+        #print("start {}\n".format([p.holding for p in self.places]))
         
         for name in firing_sequence:
             for transition in self.transitions.values():
                 if name == transition.name:
                     t = transition
                     if t.fire():
-                        print(name ," fired!")
-                        print("  =>  {}".format([p.holding for p in self.places]))
+                        pass
+                        #print(name ," fired!")
+                        #print("  =>  {}".format([p.holding for p in self.places]))
                     else:
-                        print(name, " didn't fire.")
+                        pass
+                        #print(name, " didn't fire.")
         self.calcualteAccuracy()
-        print("\nfinal {}".format([p.holding for p in self.places]))
+        #print("\nfinal {}".format([p.holding for p in self.places]))
         
 
     def printPetrinet(self):
