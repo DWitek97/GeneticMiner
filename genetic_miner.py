@@ -147,6 +147,7 @@ class geneticMiner():
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
+        print(traces)
         #print(self.allActivities)
         # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
@@ -174,24 +175,47 @@ class geneticMiner():
                 n = random.randint(0, len(offspring) - 1)
                 offspring[n].mutate()
 
-            self.listOfPetrinets.clear()
-            self.listOfPetrinets.extend(bestIndividuals)
-            self.listOfPetrinets.extend(offspring)
-            self.initializeNextPopulation(len(bestIndividuals), len(offspring))
+            # self.listOfPetrinets.clear()
+            # self.listOfPetrinets.extend(bestIndividuals)
+            # # self.listOfPetrinets.extend(offspring)
+            # self.initializeNextPopulation(len(bestIndividuals), 0)
 
         self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
         #self.listOfPetrinets[0].printPetrinet()
-        print("fitness: ", self.listOfPetrinets[0].fitness)
-        print("accuracy: ", self.listOfPetrinets[0].accuracy)
-        print("timesRun: ", self.listOfPetrinets[0].timesRun)
-        self.listOfPetrinets[0].createGraph()
+        # print("Correct: ", self.listOfPetrinets[0].getConsumedAndProducedTokens())
+        # print("difference: ", self.listOfPetrinets[0].getAllRemainingTokens())
+                    # print("fitness: ", self.listOfPetrinets[0].fitness)
+                    # print("accuracy: ", self.listOfPetrinets[0].accuracy)
+                    # print("timesRun: ", self.listOfPetrinets[0].timesRun)
+                    # self.listOfPetrinets[0].createGraph()
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 
+
+
 if __name__ == "__main__":    
     miner = geneticMiner()
-    miner.main()
-    
+    #miner.main()
+    ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5"), Place(0,"6")]
+    ts = dict(
+    A=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
+    B=Transition("B", [Out(ps[1])], [In(ps[3])]),
+    C=Transition("C", [Out(ps[2])], []), 
+    D=Transition("D", [Out(ps[3]),Out(ps[4])], [In(ps[5])]),
+    )
+
+    firing_sequence = ["A", "B", "C", "D"] # alternative deterministic example
+    firing_sequence2 = ["A", "C", "B", "D"]
+    pnet = PetriNet(ts, ps)
+    pnet.run(firing_sequence)
+    print("Accuracy: " ,pnet.accuracy)
+    pnet.resetTokens()
+    pnet.run(firing_sequence2)
+    print("Times run: ", pnet.timesRun)
+    print("Accuracy: " ,pnet.accuracy)
+    pnet.calculateFitness()
+    print("fitness: ", pnet.fitness)
+    pnet.createGraph()
     
 
 

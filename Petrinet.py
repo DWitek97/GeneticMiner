@@ -12,7 +12,7 @@ class PetriNet():
         self.places = places
         self.fitness = 0
         self.accuracy = 0.01 # average accuracy from tokenreplay, not 0 becuase algorithm would divide by 0
-        self.timesRun = 1 # times tokenreplay was run to calculate average accuracy
+        self.timesRun = 0 # times tokenreplay was run to calculate average accuracy
     
     def run(self, firing_sequence):
         """
@@ -31,13 +31,13 @@ class PetriNet():
                     t = transition
                     if t.fire():
                         pass
-                        #print(name ," fired!")
-                        #print("  =>  {}".format([p.holding for p in self.places]))
+                        print(name ," fired!")
+                        print("  =>  {}".format([p.holding for p in self.places]))
                     else:
                         pass
-                        #print(name, " didn't fire.")
+                        print(name, " didn't fire.")
         self.calcualteAccuracy()
-        #print("\nfinal {}".format([p.holding for p in self.places]))
+        print("\nfinal {}".format([p.holding for p in self.places]))
         
 
     def createGraph(self):
@@ -99,9 +99,13 @@ class PetriNet():
         self.timesRun = 1
 
     def calculateFitness(self):
-        self.fitness = self.accuracy / self.timesRun
+        if self.timesRun == 0:
+            self.fitness = self.accuracy / 1
+        else:
+            self.fitness = self.accuracy / self.timesRun 
 
     def calcualteAccuracy(self):
+        result = 0
         correct = self.getConsumedAndProducedTokens()
         difference = self.getAllRemainingTokens()
         if correct != 0:
@@ -128,7 +132,7 @@ class PetriNet():
             for outArc in self.transitions[transition].out_arcs:
                 sum += outArc.consumed
             for inArc in self.transitions[transition].in_arcs:
-                sum += inArc.produced        
+                sum += inArc.produced     
         return sum
     
     def mutate(self):
