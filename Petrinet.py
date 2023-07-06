@@ -47,7 +47,7 @@ class PetriNet():
             graph.node(transition, transition)
         graph.attr('node', shape = 'circle')
         for place in self.places:
-            graph.node(str(place.name))
+            graph.node(str(place.name), " ")
         for transition in self.transitions:
             for outArc in self.transitions[transition].out_arcs:
                 graph.edge(str(outArc.place.name), transition)

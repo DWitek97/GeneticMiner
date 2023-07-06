@@ -27,7 +27,7 @@ class geneticMiner():
     def __init__(self):
         self.allActivities = None
         self.generations = 100
-        self.populationSize = 10
+        self.populationSize = 100
         self.mutateRate = 0.1
         self.elitismRate = 0.1
         self.crossOverRate = 0.1
