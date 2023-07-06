@@ -26,8 +26,8 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 10000
-        self.populationSize = 1000
+        self.generations = 100
+        self.populationSize = 10
         self.mutateRate = 0.1
         self.elitismRate = 0.1
         self.crossOverRate = 0.1
@@ -143,14 +143,14 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        csv_datei = "Log.csv"
+        csv_datei = "Log copy.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
         #print(self.allActivities)
         # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
 
-        amountOfPlaces = len(self.allActivities) + random.randint(0, round(len(self.allActivities)/2))
+        amountOfPlaces = random.randint(round(len(self.allActivities)/2), (len(self.allActivities)) * 2)
         listOfPlaces = self.createPlaces(amountOfPlaces)
         transitions = self.createTransitions(self.allActivities, listOfPlaces)
 
@@ -180,8 +180,11 @@ class geneticMiner():
             self.initializeNextPopulation(len(bestIndividuals), len(offspring))
 
         self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
-        self.listOfPetrinets[0].printPetrinet()
-        print(self.listOfPetrinets[0].fitness)
+        #self.listOfPetrinets[0].printPetrinet()
+        print("fitness: ", self.listOfPetrinets[0].fitness)
+        print("accuracy: ", self.listOfPetrinets[0].accuracy)
+        print("timesRun: ", self.listOfPetrinets[0].timesRun)
+        self.listOfPetrinets[0].createGraph()
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 

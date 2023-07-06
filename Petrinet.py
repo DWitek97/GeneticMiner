@@ -1,4 +1,5 @@
 import random
+import graphviz
 from arc import In
 from arc import Out
 class PetriNet():
@@ -38,6 +39,21 @@ class PetriNet():
         self.calcualteAccuracy()
         #print("\nfinal {}".format([p.holding for p in self.places]))
         
+
+    def createGraph(self):
+        graph = graphviz.Digraph("Fittest net")
+        graph.attr('node', shape = 'box')
+        for transition in self.transitions:
+            graph.node(transition, transition)
+        graph.attr('node', shape = 'circle')
+        for place in self.places:
+            graph.node(str(place.name))
+        for transition in self.transitions:
+            for outArc in self.transitions[transition].out_arcs:
+                graph.edge(str(outArc.place.name), transition)
+            for inArc in self.transitions[transition].in_arcs:
+                graph.edge(transition, str(inArc.place.name))
+        graph.render(directory='nets', view=True) 
 
     def printPetrinet(self):
         for transition in self.transitions:
