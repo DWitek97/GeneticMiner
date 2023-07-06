@@ -94,7 +94,7 @@ class PetriNet():
                 inArc.produced = 0
                 inArc.place.holding = 0
         self.places[0].holding = 1
-        self.accuracy = 0.01
+        self.accuracy = 0.00001
         self.fitness = 0
         self.timesRun = 1
 
@@ -105,7 +105,7 @@ class PetriNet():
         correct = self.getConsumedAndProducedTokens()
         difference = self.getAllRemainingTokens()
         if correct != 0:
-            result = (correct - difference)/correct
+            result = (correct - difference) / correct
         else:
             result = 0
         self.accuracy = self.accuracy + result
@@ -115,7 +115,10 @@ class PetriNet():
         diff = 0
         for place in self.places:
             diff += abs(place.holding)
-        return diff - 1 # -1 because in a perfect run the petri net will have one remaining token in the last place, meaning it is correct and should not be counted towards the remaining tokens
+        if diff == 0:
+            return 0
+        else:
+            return diff - 1 # -1 because in a perfect run the petri net will have one remaining token in the last place, meaning it is correct and should not be counted towards the remaining tokens
         
 
     # Gets the count of all tokens, that have been consumed and produced during the run of the self
