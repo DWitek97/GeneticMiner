@@ -7,6 +7,7 @@ class logreader():
         self.traces = []
         self.activities = []
         self.daten = None
+        self.numberAllActivities = 0
 
     def readLogs(self, path):
         self.daten = pd.read_csv(path)
@@ -15,6 +16,7 @@ class logreader():
             trace = []
             for char in zeile["Activity"]:
                 trace.append(char)
+                self.numberAllActivities += 1
             self.traces.append(list(trace)) 
         return self.traces
 
@@ -24,4 +26,10 @@ class logreader():
                 if char not in self.activities:
                     self.activities.append(char) 
         return self.activities
+    
+    def getCountOfAllActivities(self):
+        return self.numberAllActivities
+    
+    def getNumberOfTraces(self):
+        return len(self.traces)
 

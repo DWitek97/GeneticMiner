@@ -28,7 +28,7 @@ class Out(ArcBase):
             return True
         else:
             self.missing +=1
-            return True 
+            return False 
         
 
 class In(ArcBase):  
@@ -43,5 +43,5 @@ class In(ArcBase):
         if self.place.holding == 0:
             return True
         else:
-            return True
+            return False
         #return self.place.holding == 0

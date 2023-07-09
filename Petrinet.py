@@ -1,5 +1,6 @@
 import random
 import graphviz
+from logReader import logreader
 from arc import In
 from arc import Out
 class PetriNet():
@@ -10,9 +11,12 @@ class PetriNet():
         """
         self.transitions = transitions
         self.places = places
-        self.fitness = 0
+        self.fitness = 0.00
         self.accuracy = 0.01 # average accuracy from tokenreplay, not 0 becuase algorithm would divide by 0
         self.timesRun = 0 # times tokenreplay was run to calculate average accuracy
+        self.successTraces = 0
+        self.successActivities = 0
+        self.numberOfActivitiesInLog = 0
     
     def run(self, firing_sequence):
         """
@@ -28,9 +32,10 @@ class PetriNet():
         for name in firing_sequence:
             for transition in self.transitions.values():
                 if name == transition.name:
+                    self.numberOfActivitiesInLog += 1
                     t = transition
                     if t.fire():
-                        pass
+                        self.successActivities += 1
                         #print(name ," fired!")
                         #print("  =>  {}".format([p.holding for p in self.places]))
                     else:
@@ -96,13 +101,14 @@ class PetriNet():
         self.places[0].holding = 1
         self.accuracy = 0.00001
         self.fitness = 0
-        self.timesRun = 1
+        self.timesRun = 0
+        self.successTraces = 0
+        self.successActivities = 0
+        self.numberOfActivitiesInLog = 0
 
-    def calculateFitness(self):
-        if self.timesRun == 0:
-            self.fitness = self.accuracy / 1
-        else:
-            self.fitness = self.accuracy / self.timesRun 
+    def calculateFitness(self, numberOfTraces):
+            self.fitness = 0.4 * (self.successActivities / self.numberOfActivitiesInLog) + 0.6 * (self.successTraces / numberOfTraces) 
+            return
 
     def calcualteAccuracy(self):
         result = 0
@@ -119,6 +125,8 @@ class PetriNet():
         diff = 0
         for place in self.places:
             diff += abs(place.holding)
+        if diff == 1:
+            self.successTraces += 1
         if diff == 0:
             return 0
         else:

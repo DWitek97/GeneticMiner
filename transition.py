@@ -19,9 +19,9 @@ class Transition:
         # Note: This would have to be checked differently for variants of
         # petri  nets that take more than once from a place, per transition.
         notBlocked = outNotBlocked and inNotBlocked
-        if notBlocked:
-            for arc in self.out_arcs:
-                arc.trigger()
-            for arc in self.in_arcs:
-                arc.trigger()
+        
+        for arc in self.out_arcs:
+            arc.trigger()
+        for arc in self.in_arcs:
+            arc.trigger()
         return notBlocked # return if fired, just for the sake of debuging

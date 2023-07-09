@@ -26,12 +26,14 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 100
+        self.generations = 1000
         self.populationSize = 100
         self.mutateRate = 0.1
         self.elitismRate = 0.1
         self.crossOverRate = 0.1
+        self.numberOfAllTraces = 0
         self.listOfPetrinets = []
+        self.bestFitness = 0.0
 
     def createTransitions(self, listOfTransitions, listOfPlaces):
         transitionsList = {}
@@ -147,6 +149,7 @@ class geneticMiner():
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
+        self.numberOfAllTraces = reader.getNumberOfTraces()
         print(traces)
         #print(self.allActivities)
         # listOfTransitions = ["A", "B", "C", "D", "E", "F", "G", "H"]
@@ -165,7 +168,7 @@ class geneticMiner():
                 for trace in traces:
                     petriNet.run(trace)
                     petriNet.resetTokens()
-                petriNet.calculateFitness()
+                petriNet.calculateFitness(self.numberOfAllTraces)
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
             bestIndividuals = self.listOfPetrinets[:int(self.populationSize * self.elitismRate)]
@@ -175,18 +178,26 @@ class geneticMiner():
                 n = random.randint(0, len(offspring) - 1)
                 offspring[n].mutate()
 
-            # self.listOfPetrinets.clear()
-            # self.listOfPetrinets.extend(bestIndividuals)
-            # # self.listOfPetrinets.extend(offspring)
-            # self.initializeNextPopulation(len(bestIndividuals), 0)
+            self.listOfPetrinets.clear()
+            self.listOfPetrinets.extend(bestIndividuals)
+            self.listOfPetrinets.extend(offspring)
+            self.initializeNextPopulation(len(bestIndividuals), 0)
 
         self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
         #self.listOfPetrinets[0].printPetrinet()
         # print("Correct: ", self.listOfPetrinets[0].getConsumedAndProducedTokens())
         # print("difference: ", self.listOfPetrinets[0].getAllRemainingTokens())
+        self.bestFitness = self.listOfPetrinets[0].fitness
         print("fitness: ", self.listOfPetrinets[0].fitness)
-        print("accuracy: ", self.listOfPetrinets[0].accuracy)
-        print("timesRun: ", self.listOfPetrinets[0].timesRun)
+        #print("accuracy: ", self.listOfPetrinets[0].accuracy)
+        print("successActivities: ", self.listOfPetrinets[0].successActivities)
+        print("numberOfActivitiesInLog: ", self.listOfPetrinets[0].numberOfActivitiesInLog)
+
+        print("success traces: ", self.listOfPetrinets[0].successTraces)
+        print("number of traces: ", self.listOfPetrinets[0].timesRun)
+        print("miner number of traces: ",  self.numberOfAllTraces)
+        
+
         self.listOfPetrinets[0].createGraph()
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))

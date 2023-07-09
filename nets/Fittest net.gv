@@ -1,24 +1,25 @@
 digraph "Fittest net" {
 	node [shape=box]
-	A [label=A]
-	B [label=B]
 	C [label=C]
 	D [label=D]
+	A [label=A]
+	B [label=B]
 	node [shape=circle]
 	1 [label=" "]
 	2 [label=" "]
 	3 [label=" "]
 	4 [label=" "]
 	5 [label=" "]
-	2 -> A
-	A -> 3
-	A -> 4
-	3 -> B
-	B -> 4
-	3 -> C
+	2 -> C
 	4 -> C
-	1 -> C
-	4 -> D
-	D -> 3
-	D -> 2
+	C -> 1
+	1 -> D
+	2 -> D
+	1 -> A
+	A -> 2
+	A -> 4
+	A -> 3
+	3 -> B
+	B -> 2
+	B -> 5
 }
