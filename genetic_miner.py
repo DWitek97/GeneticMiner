@@ -39,37 +39,39 @@ class geneticMiner():
         transitionsList = {}
         for transition in listOfTransitions:
             
-            duplicateList = []
+            duplicateListIn = []
+            duplicateListOut = []
             listOfOut = []
             listOfIn = []
 
             # checks if arc already exists to avoid 1-loops since most nets 
             # dont have 1-loops anyways it also improves the accuarcy of the nets.
             # Can be removed if wanted, tokenreplay also works with 1-loops.
-            alreadyExists = False
+            alreadyExistsIn = False
+            alreadyExistsOut = False
             
-            amountOfOutArcs = random.randint(1,4)
-            amountOfInArcs = random.randint(1,4)
+            amountOfOutArcs = random.randint(1,3)
+            amountOfInArcs = random.randint(1,3)
 
             for i in range(amountOfOutArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for outArc in duplicateList:
+                for outArc in duplicateListIn:
                     if listOfPlaces[index].name == outArc.place.name:
-                        alreadyExists = True
-                if not alreadyExists:
-                    duplicateList.append(Out(listOfPlaces[index]))
+                        alreadyExistsIn = True
+                if not alreadyExistsIn:
+                    duplicateListIn.append(Out(listOfPlaces[index]))
                     listOfOut.append(Out(listOfPlaces[index]))
-                alreadyExists = False
+                alreadyExistsIn = False
 
             for i in range(amountOfInArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for inArc in duplicateList:
+                for inArc in duplicateListOut:
                     if listOfPlaces[index].name == inArc.place.name:
-                        alreadyExists = True
-                if not alreadyExists:
-                    duplicateList.append(In(listOfPlaces[index]))
+                        alreadyExistsOut = True
+                if not alreadyExistsOut:
+                    duplicateListOut.append(In(listOfPlaces[index]))
                     listOfIn.append(In(listOfPlaces[index]))
-                alreadyExists = False
+                alreadyExistsOut = False
 
             transitionsList[transition] = Transition(transition, listOfOut, listOfIn)
 
@@ -145,7 +147,7 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        csv_datei = "Log copy.csv"
+        csv_datei = "Log.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -161,8 +163,8 @@ class geneticMiner():
         self.initializeStartingPopulation()
 
         # run tokenreplay of all traces for every net
-        for generation in range(self.generations):
-        #while self.bestFitness < 0.8:
+        #for generation in range(self.generations):
+        while self.bestFitness < 0.5:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
