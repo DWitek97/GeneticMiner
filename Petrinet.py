@@ -31,13 +31,13 @@ class PetriNet():
                     t = transition
                     if t.fire():
                         pass
-                        print(name ," fired!")
-                        print("  =>  {}".format([p.holding for p in self.places]))
+                        #print(name ," fired!")
+                        #print("  =>  {}".format([p.holding for p in self.places]))
                     else:
                         pass
-                        print(name, " didn't fire.")
+                        #print(name, " didn't fire.")
         self.calcualteAccuracy()
-        print("\nfinal {}".format([p.holding for p in self.places]))
+        #print("\nfinal {}".format([p.holding for p in self.places]))
         
 
     def createGraph(self):
