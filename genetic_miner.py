@@ -162,6 +162,7 @@ class geneticMiner():
 
         # run tokenreplay of all traces for every net
         for generation in range(self.generations):
+        #while self.bestFitness < 0.8:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
@@ -171,6 +172,7 @@ class geneticMiner():
                 petriNet.calculateFitness(self.numberOfAllTraces)
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
+            self.bestFitness = self.listOfPetrinets[0].fitness
             bestIndividuals = self.listOfPetrinets[:int(self.populationSize * self.elitismRate)]
             offspring = self.doCrossOver(bestIndividuals)
 
@@ -187,7 +189,7 @@ class geneticMiner():
         #self.listOfPetrinets[0].printPetrinet()
         # print("Correct: ", self.listOfPetrinets[0].getConsumedAndProducedTokens())
         # print("difference: ", self.listOfPetrinets[0].getAllRemainingTokens())
-        self.bestFitness = self.listOfPetrinets[0].fitness
+        
         print("fitness: ", self.listOfPetrinets[0].fitness)
         #print("accuracy: ", self.listOfPetrinets[0].accuracy)
         print("successActivities: ", self.listOfPetrinets[0].successActivities)

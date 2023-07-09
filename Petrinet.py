@@ -17,6 +17,7 @@ class PetriNet():
         self.successTraces = 0
         self.successActivities = 0
         self.numberOfActivitiesInLog = 0
+        self.succesfulTrace = True
     
     def run(self, firing_sequence):
         """
@@ -26,6 +27,7 @@ class PetriNet():
         :ps: Place holdings to print during the run (debugging).
         """
         self.timesRun += 1
+        self.succesfulTrace = True
         #print("Using firing sequence:\n" + " => ".join(firing_sequence))
         #print("start {}\n".format([p.holding for p in self.places]))
         
@@ -39,9 +41,11 @@ class PetriNet():
                         #print(name ," fired!")
                         #print("  =>  {}".format([p.holding for p in self.places]))
                     else:
-                        pass
+                        self.succesfulTrace = False
                         #print(name, " didn't fire.")
         self.calcualteAccuracy()
+        # if self.succesfulTrace:
+        #     self.successTraces += 1
         #print("\nfinal {}".format([p.holding for p in self.places]))
         
 
@@ -125,7 +129,7 @@ class PetriNet():
         diff = 0
         for place in self.places:
             diff += abs(place.holding)
-        if diff == 1:
+        if diff == 1 and self.succesfulTrace:
             self.successTraces += 1
         if diff == 0:
             return 0
