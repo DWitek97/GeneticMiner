@@ -26,7 +26,7 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 1000
+        self.generations = 100
         self.populationSize = 100
         self.mutateRate = 0.1
         self.elitismRate = 0.1
@@ -34,6 +34,7 @@ class geneticMiner():
         self.numberOfAllTraces = 0
         self.listOfPetrinets = []
         self.bestFitness = 0.0
+        self.maxEnabledActivities = 1
 
     def createTransitions(self, listOfTransitions, listOfPlaces):
         transitionsList = {}
@@ -163,15 +164,20 @@ class geneticMiner():
         self.initializeStartingPopulation()
 
         # run tokenreplay of all traces for every net
-        #for generation in range(self.generations):
-        while self.bestFitness < 0.5:
+        for generation in range(self.generations):
+        #while self.bestFitness < 0.5:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
                 for trace in traces:
                     petriNet.run(trace)
                     petriNet.resetTokens()
-                petriNet.calculateFitness(self.numberOfAllTraces)
+                self.listOfPetrinets.sort(key=lambda x: x.enabledActivities, reverse=True)   
+                if self.maxEnabledActivities < self.listOfPetrinets[0].enabledActivities:
+                     self.maxEnabledActivities = self.listOfPetrinets[0].enabledActivities
+                petriNet.calculateFitness(self.maxEnabledActivities)
+
+
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
             self.bestFitness = self.listOfPetrinets[0].fitness

@@ -3,6 +3,7 @@ import graphviz
 from logReader import logreader
 from arc import In
 from arc import Out
+
 class PetriNet():
     def __init__(self, transitions, places):
         """
@@ -18,6 +19,11 @@ class PetriNet():
         self.successActivities = 0
         self.numberOfActivitiesInLog = 0
         self.succesfulTrace = True
+        self.allMissingTokens = 0
+        self.numberOfTracesMissingTokens = 0
+        self.allRemainingTokens = 0
+        self.numberOfTracesRemainingTokens = 0
+        self.enabledActivities = 0
     
     def run(self, firing_sequence):
         """
@@ -36,6 +42,7 @@ class PetriNet():
                 if name == transition.name:
                     self.numberOfActivitiesInLog += 1
                     t = transition
+                    self.getEnabledActivities()
                     if t.fire():
                         self.successActivities += 1
                         #print(name ," fired!")
@@ -43,6 +50,7 @@ class PetriNet():
                     else:
                         self.succesfulTrace = False
                         #print(name, " didn't fire.")
+                    #print("  =>  {}".format([p.holding for p in self.places]))
         self.calcualteAccuracy()
         # if self.succesfulTrace:
         #     self.successTraces += 1
@@ -109,10 +117,27 @@ class PetriNet():
         self.successTraces = 0
         self.successActivities = 0
         self.numberOfActivitiesInLog = 0
+        self.numberOfTracesMissingTokens = 0
+        self.numberOfTracesRemainingTokens = 0
+        self.allMissingTokens = 0
+        self.allRemainingTokens = 0
+        self.enabledActivities = 0
 
-    def calculateFitness(self, numberOfTraces):
-            self.fitness = 0.4 * (self.successActivities / self.numberOfActivitiesInLog) + 0.6 * (self.successTraces / numberOfTraces) 
+    def calculateFitness(self, maxEnabledActivities):
+            partifalfitnees = self.partialfitness()
+            k = 1
+            self.fitness = partifalfitnees - k * (self.enabledActivities / maxEnabledActivities)
             return
+
+    def partialfitness(self):
+        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + (self.allRemainingTokens / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
+        return (self.successActivities - punishment) / self.numberOfActivitiesInLog
+
+    def getEnabledActivities(self):
+        for t in self.transitions.values():
+            if t.checkEnabledActivity():
+                self.enabledActivities += 1
+        return
 
     def calcualteAccuracy(self):
         result = 0
@@ -124,13 +149,38 @@ class PetriNet():
             result = 0
         self.accuracy = self.accuracy + result
 
+    def checkTrace(self):
+        missingToken = False
+        remainingToken = False
+        for place in self.places:
+            if place.holding < 0:
+                missingToken = True
+                self.numberOfTracesMissingTokens += 1
+
     # Counts all tokens remaining in the self with absolute values. [-1, 1, 0] => 2 remaining tokens
     def getAllRemainingTokens(self):
         diff = 0
+        missingToken = False
+        remainingToken = False
         for place in self.places:
+            if place.holding < 0:
+                self.allMissingTokens += abs(place.holding)
+                missingToken = True
+            else:
+                self.allRemainingTokens += place.holding
             diff += abs(place.holding)
+            if diff > 1:
+                remainingToken = True
+
         if diff == 1 and self.succesfulTrace:
             self.successTraces += 1
+
+        if missingToken:
+            self.numberOfTracesMissingTokens += 1
+
+        if remainingToken:
+            self.numberOfTracesRemainingTokens += 1
+
         if diff == 0:
             return 0
         else:

@@ -25,3 +25,8 @@ class Transition:
         for arc in self.in_arcs:
             arc.trigger()
         return notBlocked # return if fired, just for the sake of debuging
+    
+    def checkEnabledActivity(self):
+        outNotBlocked = all(arc.non_blocking() for arc in self.out_arcs)
+        inNotBlocked = all(arc.non_blocking() for arc in self.in_arcs)
+        return outNotBlocked and inNotBlocked
