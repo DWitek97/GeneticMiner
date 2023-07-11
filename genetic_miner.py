@@ -213,7 +213,7 @@ if __name__ == "__main__":
     # ts = dict(
     # A=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
     # B=Transition("B", [Out(ps[1])], [In(ps[3])]),
-    # C=Transition("C", [Out(ps[2])], []), 
+    # C=Transition("C", [Out(ps[2])], [In(ps[4])]), 
     # D=Transition("D", [Out(ps[3]),Out(ps[4])], [In(ps[5])]),
     # )
 

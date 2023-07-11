@@ -110,8 +110,8 @@ class PetriNet():
         self.successActivities = 0
         self.numberOfActivitiesInLog = 0
 
-    def calculateFitness(self, numberOfTraces):
-            self.fitness = 0.4 * (self.successActivities / self.numberOfActivitiesInLog) + 0.6 * (self.successTraces / numberOfTraces) 
+    def calculateFitness(self):
+            self.fitness = 0.4 * (self.successActivities / self.numberOfActivitiesInLog) + 0.6 * (self.successTraces / self.timesRun) 
             return
 
     def calcualteAccuracy(self):
