@@ -130,7 +130,7 @@ class PetriNet():
             return
 
     def partialfitness(self):
-        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + (self.allRemainingTokens / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
+        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + ((self.allRemainingTokens - 1) / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
         return (self.successActivities - punishment) / self.numberOfActivitiesInLog
 
     def getEnabledActivities(self):
