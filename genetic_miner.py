@@ -173,7 +173,7 @@ class geneticMiner():
                 self.listOfPetrinets.sort(key=lambda x: x.enabledActivities, reverse=True)   
                 if self.maxEnabledActivities < self.listOfPetrinets[0].enabledActivities:
                      self.maxEnabledActivities = self.listOfPetrinets[0].enabledActivities
-                petriNet.calculateFitness(self.maxEnabledActivities)
+                petriNet.calculateFitness(self.maxEnabledActivities, 1)
 
 
 
@@ -219,7 +219,7 @@ if __name__ == "__main__":
     # ts = dict(
     # A=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
     # B=Transition("B", [Out(ps[1])], [In(ps[3])]),
-    # C=Transition("C", [Out(ps[2])], []), 
+    # C=Transition("C", [Out(ps[2])], [In(ps[4])]), 
     # D=Transition("D", [Out(ps[3]),Out(ps[4])], [In(ps[5])]),
     # )
 
@@ -232,7 +232,7 @@ if __name__ == "__main__":
     # pnet.run(firing_sequence2)
     # print("Times run: ", pnet.timesRun)
     # print("Accuracy: " ,pnet.accuracy)
-    # pnet.calculateFitness()
+    # pnet.calculateFitness(10)
     # print("fitness: ", pnet.fitness)
     # pnet.createGraph()
     

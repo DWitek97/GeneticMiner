@@ -123,14 +123,13 @@ class PetriNet():
         self.allRemainingTokens = 0
         self.enabledActivities = 0
 
-    def calculateFitness(self, maxEnabledActivities):
+    def calculateFitness(self, maxEnabledActivities, k):
             partifalfitnees = self.partialfitness()
-            k = 1
             self.fitness = partifalfitnees - k * (self.enabledActivities / maxEnabledActivities)
             return
 
     def partialfitness(self):
-        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + ((self.allRemainingTokens - 1) / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
+        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + ((self.allRemainingTokens) / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
         return (self.successActivities - punishment) / self.numberOfActivitiesInLog
 
     def getEnabledActivities(self):
@@ -171,6 +170,8 @@ class PetriNet():
             diff += abs(place.holding)
             if diff > 1:
                 remainingToken = True
+
+        self.allRemainingTokens -= 1
 
         if diff == 1 and self.succesfulTrace:
             self.successTraces += 1
