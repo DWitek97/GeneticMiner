@@ -40,7 +40,7 @@ class In(ArcBase):
         self.produced += 1
         
     def non_blocking(self):
-        if self.place.holding == 0:
+        if self.place.holding < 1:
             return True
         else:
             return False

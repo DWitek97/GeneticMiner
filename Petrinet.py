@@ -129,7 +129,7 @@ class PetriNet():
             return
 
     def partialfitness(self):
-        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + ((self.allRemainingTokens) / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
+        punishment = (self.allMissingTokens / (self.timesRun - self.numberOfTracesMissingTokens + 1)) + ((abs(self.allRemainingTokens)) / (self.timesRun - self.numberOfTracesRemainingTokens + 1))
         return (self.successActivities - punishment) / self.numberOfActivitiesInLog
 
     def getEnabledActivities(self):
@@ -170,6 +170,7 @@ class PetriNet():
             diff += abs(place.holding)
             if diff > 1:
                 remainingToken = True
+
 
         self.allRemainingTokens -= 1
 
@@ -222,9 +223,9 @@ class PetriNet():
                 out_or_in = random.randint(0,1)
                 if out_or_in == 0:
                     Tkey = list(self.transitions)[t_index]
-                    if len(self.transitions[Tkey].out_arcs) == 0:
+                    if len(self.transitions[Tkey].out_arcs) > 0:
                         self.transitions[Tkey].out_arcs.pop()
                 else:
                     Tkey = list(self.transitions)[t_index]
-                    if len(self.transitions[Tkey].out_arcs) == 0:
+                    if len(self.transitions[Tkey].in_arcs) > 0:
                         self.transitions[Tkey].in_arcs.pop()

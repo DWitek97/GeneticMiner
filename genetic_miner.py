@@ -49,8 +49,8 @@ class geneticMiner():
             # Can be removed if wanted, tokenreplay also works with 1-loops.
             alreadyExists = False
             
-            amountOfOutArcs = random.randint(1,4)
-            amountOfInArcs = random.randint(1,4)
+            amountOfOutArcs = random.randint(1,3)
+            amountOfInArcs = random.randint(1,3)
 
             for i in range(amountOfOutArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
@@ -173,7 +173,7 @@ class geneticMiner():
                 self.listOfPetrinets.sort(key=lambda x: x.enabledActivities, reverse=True)   
                 if self.maxEnabledActivities < self.listOfPetrinets[0].enabledActivities:
                      self.maxEnabledActivities = self.listOfPetrinets[0].enabledActivities
-                petriNet.calculateFitness(self.maxEnabledActivities, 1)
+                petriNet.calculateFitness(self.maxEnabledActivities, 0.35)
 
 
 
@@ -198,6 +198,12 @@ class geneticMiner():
         
         print("fitness: ", self.listOfPetrinets[0].fitness)
         #print("accuracy: ", self.listOfPetrinets[0].accuracy)
+
+        print("allMissingTokens: ", self.listOfPetrinets[0].allMissingTokens)
+        print("allRemainingTokens: ", self.listOfPetrinets[0].allRemainingTokens)
+
+        print("enabledActivities: ", self.listOfPetrinets[0].enabledActivities)
+        print("maxEnabledActivities: ", self.maxEnabledActivities)
         print("successActivities: ", self.listOfPetrinets[0].successActivities)
         print("numberOfActivitiesInLog: ", self.listOfPetrinets[0].numberOfActivitiesInLog)
 
@@ -230,9 +236,11 @@ if __name__ == "__main__":
     # print("Accuracy: " ,pnet.accuracy)
     # pnet.resetTokens()
     # pnet.run(firing_sequence2)
+    # print("allMissingTokens: ", pnet.allMissingTokens)
+    # print("allRemainingTokens: ", pnet.allRemainingTokens)
     # print("Times run: ", pnet.timesRun)
     # print("Accuracy: " ,pnet.accuracy)
-    # pnet.calculateFitness(10)
+    # pnet.calculateFitness(30, 0.35)
     # print("fitness: ", pnet.fitness)
     # pnet.createGraph()
     
