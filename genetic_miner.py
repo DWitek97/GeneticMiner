@@ -162,14 +162,14 @@ class geneticMiner():
 
         # run tokenreplay of all traces for every net
         #for generation in range(self.generations):
-        while self.bestFitness < 0.5:
+        while self.bestFitness < 0.8:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
                 for trace in traces:
                     petriNet.run(trace)
                     petriNet.resetTokens()
-                petriNet.calculateFitness(self.numberOfAllTraces)
+                petriNet.calculateFitness()
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
             self.bestFitness = self.listOfPetrinets[0].fitness

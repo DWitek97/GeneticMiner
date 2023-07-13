@@ -18,6 +18,13 @@ class Transition:
         inNotBlocked = all(arc.non_blocking() for arc in self.in_arcs)
         # Note: This would have to be checked differently for variants of
         # petri  nets that take more than once from a place, per transition.
+        
+
+        if len(self.out_arcs) == 0:
+            outNotBlocked = False
+        if len(self.in_arcs) == 0:
+            inNotBlocked = False
+
         notBlocked = outNotBlocked and inNotBlocked
         
         for arc in self.out_arcs:
