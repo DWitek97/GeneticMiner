@@ -5,6 +5,7 @@ from transition import Transition
 from place import Place
 from arc import In
 from arc import Out
+import time 
 
 """
 Modeling approach:
@@ -161,6 +162,7 @@ class geneticMiner():
 
         self.initializeStartingPopulation()
 
+        start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
         for generation in range(self.generations):
         #while self.bestFitness < 0.5:
@@ -213,6 +215,8 @@ class geneticMiner():
         
 
         self.listOfPetrinets[0].createGraph()
+        end_time = time.perf_counter()
+        print("Time: ", end_time - start_time, " seconds")
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 
