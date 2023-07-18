@@ -5,6 +5,7 @@ from transition import Transition
 from place import Place
 from arc import In
 from arc import Out
+import time 
 
 """
 Modeling approach:
@@ -29,7 +30,7 @@ class geneticMiner():
         self.generations = 1000
         self.populationSize = 100
         self.mutateRate = 0.1
-        self.elitismRate = 0.1
+        self.elitismRate = 0.05
         self.crossOverRate = 0.1
         self.numberOfAllTraces = 0
         self.listOfPetrinets = []
@@ -160,9 +161,10 @@ class geneticMiner():
 
         self.initializeStartingPopulation()
 
+        start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
-        #for generation in range(self.generations):
-        while self.bestFitness < 0.8:
+        for generation in range(self.generations):
+        #while self.bestFitness < 0.7:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
@@ -201,6 +203,8 @@ class geneticMiner():
         
 
         self.listOfPetrinets[0].createGraph()
+        end_time = time.perf_counter()
+        print("Time: ", end_time - start_time)
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 
@@ -209,12 +213,12 @@ class geneticMiner():
 if __name__ == "__main__":    
     miner = geneticMiner()
     miner.main()
-    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5"), Place(0,"6")]
+    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5"), Place(0,"6"), Place(0,"7")]
     # ts = dict(
     # A=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-    # B=Transition("B", [Out(ps[1])], [In(ps[3])]),
-    # C=Transition("C", [Out(ps[2])], [In(ps[4])]), 
-    # D=Transition("D", [Out(ps[3]),Out(ps[4])], [In(ps[5])]),
+    # B=Transition("B", [Out(ps[1]), Out(ps[4])], [In(ps[3]), In(ps[6])]),
+    # C=Transition("C", [Out(ps[2]), Out(ps[6])], [In(ps[3]), In(ps[4])]), 
+    # D=Transition("D", [Out(ps[3])], [In(ps[5])]),
     # )
 
     # firing_sequence = ["A", "B", "C", "D"] # alternative deterministic example
@@ -224,7 +228,11 @@ if __name__ == "__main__":
     # print("Accuracy: " ,pnet.accuracy)
     # pnet.resetTokens()
     # pnet.run(firing_sequence2)
-    # print("Times run: ", pnet.timesRun)
+    # print("successActivities: ", pnet.successActivities)
+    # print("numberOfActivitiesInLog: ", pnet.numberOfActivitiesInLog)
+
+    # print("success traces: ", pnet.successTraces)
+    # print("number of traces: ", pnet.timesRun)
     # print("Accuracy: " ,pnet.accuracy)
     # pnet.calculateFitness()
     # print("fitness: ", pnet.fitness)

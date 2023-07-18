@@ -9,14 +9,20 @@ digraph "Fittest net" {
 	2 [label=" "]
 	3 [label=" "]
 	4 [label=" "]
+	5 [label=" "]
+	6 [label=" "]
+	7 [label=" "]
 	1 -> A
-	A -> 4
+	A -> 2
 	A -> 3
-	4 -> B
-	B -> 1
+	2 -> B
+	5 -> B
+	B -> 4
+	B -> 7
 	3 -> C
-	C -> 2
-	1 -> D
-	2 -> D
-	D -> 3
+	7 -> C
+	C -> 4
+	C -> 5
+	4 -> D
+	D -> 6
 }
