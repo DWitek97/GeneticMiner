@@ -36,6 +36,7 @@ class PetriNet():
                     else:
                         pass
                         #print(name, " didn't fire.")
+                        #print("  =>  {}".format([p.holding for p in self.places]))
         self.calcualteAccuracy()
         #print("\nfinal {}".format([p.holding for p in self.places]))
         
@@ -96,7 +97,7 @@ class PetriNet():
         self.places[0].holding = 1
         self.accuracy = 0.00001
         self.fitness = 0
-        self.timesRun = 1
+        self.timesRun = 0
 
     def calculateFitness(self):
         if self.timesRun == 0:
