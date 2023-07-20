@@ -27,7 +27,7 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 1000
+        self.generations = 100
         self.populationSize = 100
         self.mutateRate = 0.1
         self.elitismRate = 0.1
@@ -147,7 +147,8 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        csv_datei = "Log copy.csv"
+        self.generations = 10000
+        csv_datei = "logs/big_example_net_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -172,6 +173,7 @@ class geneticMiner():
                 for trace in traces:
                     petriNet.run(trace)
                     petriNet.resetTokens()
+                    
                 self.listOfPetrinets.sort(key=lambda x: x.enabledActivities, reverse=True)   
                 if self.maxEnabledActivities < self.listOfPetrinets[0].enabledActivities:
                      self.maxEnabledActivities = self.listOfPetrinets[0].enabledActivities
@@ -197,7 +199,7 @@ class geneticMiner():
         #self.listOfPetrinets[0].printPetrinet()
         # print("Correct: ", self.listOfPetrinets[0].getConsumedAndProducedTokens())
         # print("difference: ", self.listOfPetrinets[0].getAllRemainingTokens())
-        
+
         print("fitness: ", self.listOfPetrinets[0].fitness)
         #print("accuracy: ", self.listOfPetrinets[0].accuracy)
 
