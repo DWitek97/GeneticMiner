@@ -144,7 +144,7 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        csv_datei = "logs/small_example_net_complete.csv"
+        csv_datei = "logs/and_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()

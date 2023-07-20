@@ -118,8 +118,13 @@ class PetriNet():
     # Counts all tokens remaining in the self with absolute values. [-1, 1, 0] => 2 remaining tokens
     def getAllRemainingTokens(self):
         diff = 0
+        for t in self.transitions.values():
+            for outArc in t.out_arcs:
+                diff += outArc.missing
+    
         for place in self.places:
-            diff += abs(place.holding)
+            if place.holding > 0:
+                diff += place.holding
         if diff == 0:
             return 0
         else:
