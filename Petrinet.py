@@ -159,12 +159,15 @@ class PetriNet():
         diff = 0
         missingToken = False
         remainingToken = False
+        for t in self.transitions.values():
+            for outarc in t.out_arcs:
+                if outarc.missing < 0:
+                    self.allMissingTokens += outarc.missing
+                    missingToken = True
         for place in self.places:
-            if place.holding < 0:
-                self.allMissingTokens += abs(place.holding)
-                missingToken = True
-            else:
+            if place.holding > 0:
                 self.allRemainingTokens += place.holding
+                
             diff += abs(place.holding)
             if diff > 1:
                 remainingToken = True
