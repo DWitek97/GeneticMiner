@@ -147,7 +147,7 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        #self.generations = 100
+        self.generations = 100
         csv_datei = "logs/and_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
@@ -173,8 +173,6 @@ class geneticMiner():
                 for trace in traces:
                     petriNet.resetTokens()
                     petriNet.run(trace)
-                    
-                    
                 self.listOfPetrinets.sort(key=lambda x: x.enabledActivities, reverse=True)   
                 if self.maxEnabledActivities < self.listOfPetrinets[0].enabledActivities:
                      self.maxEnabledActivities = self.listOfPetrinets[0].enabledActivities
