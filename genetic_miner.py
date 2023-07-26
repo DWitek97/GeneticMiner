@@ -153,7 +153,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 1000
-        csv_datei = "logs/and_complete.csv"
+        csv_datei = "logs/small_example_net_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -170,8 +170,8 @@ class geneticMiner():
 
         start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
-        for generation in range(self.generations):
-        #while self.bestFitness < 0.8:
+        #for generation in range(self.generations):
+        while self.bestFitness < 0.9:
             self.doneGenerations += 1
             for net in self.listOfPetrinets:
                 net.resetAll()
@@ -201,6 +201,7 @@ class geneticMiner():
             self.listOfPetrinets.extend(bestIndividuals)
             self.listOfPetrinets.extend(offspring)
             self.initializeNextPopulation(len(bestIndividuals), 0)
+            print("Current Fitness: ", self.bestFitness, " ", "Done Generations: ", self.doneGenerations)
 
         self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
         #self.listOfPetrinets[0].printPetrinet()
@@ -225,6 +226,7 @@ class geneticMiner():
         self.listOfPetrinets[0].createGraph()
         end_time = time.perf_counter()
         print("Time: ", end_time - start_time, " seconds")
+        print("Done Generations: ", self.doneGenerations)
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 
