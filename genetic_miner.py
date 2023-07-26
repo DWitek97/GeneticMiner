@@ -27,20 +27,23 @@ class geneticMiner():
 
     def __init__(self):
         self.allActivities = None
-        self.generations = 1000
+        self.generations = 100
         self.populationSize = 100
         self.mutateRate = 0.1
-        self.elitismRate = 0.05
+        self.elitismRate = 0.1
         self.crossOverRate = 0.1
         self.numberOfAllTraces = 0
         self.listOfPetrinets = []
         self.bestFitness = 0.0
+        self.doneGenerations = 0
 
     def createTransitions(self, listOfTransitions, listOfPlaces):
         transitionsList = {}
         for transition in listOfTransitions:
             
             duplicateList = []
+            duplicateListIn = []
+            duplicateListOut = []
             listOfOut = []
             listOfIn = []
 
@@ -49,26 +52,28 @@ class geneticMiner():
             # Can be removed if wanted, tokenreplay also works with 1-loops.
             alreadyExists = False
             
-            amountOfOutArcs = random.randint(1,4)
-            amountOfInArcs = random.randint(1,4)
+            amountOfOutArcs = random.randint(1,3)
+            amountOfInArcs = random.randint(1,3)
 
             for i in range(amountOfOutArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for outArc in duplicateList:
+                for outArc in duplicateListOut:
                     if listOfPlaces[index].name == outArc.place.name:
                         alreadyExists = True
                 if not alreadyExists:
-                    duplicateList.append(Out(listOfPlaces[index]))
+                    duplicateListOut.append(Out(listOfPlaces[index]))
                     listOfOut.append(Out(listOfPlaces[index]))
                 alreadyExists = False
 
+            alreadyExists = False
+
             for i in range(amountOfInArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for inArc in duplicateList:
+                for inArc in duplicateListIn:
                     if listOfPlaces[index].name == inArc.place.name:
                         alreadyExists = True
                 if not alreadyExists:
-                    duplicateList.append(In(listOfPlaces[index]))
+                    duplicateListIn.append(In(listOfPlaces[index]))
                     listOfIn.append(In(listOfPlaces[index]))
                 alreadyExists = False
 
@@ -146,7 +151,8 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        csv_datei = "logs/small_example_net_complete.csv"
+        self.generations = 100
+        csv_datei = "logs/1-loop_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -164,14 +170,15 @@ class geneticMiner():
         start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
         for generation in range(self.generations):
-        #while self.bestFitness < 0.7:
+            self.doneGenerations += 1
+        #while self.bestFitness < 0.9:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
                 for trace in traces:
-                    petriNet.run(trace)
                     petriNet.resetTokens()
-                petriNet.calculateFitness()
+                    petriNet.run(trace)
+                petriNet.calculateFitness()   
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
             self.bestFitness = self.listOfPetrinets[0].fitness
@@ -191,20 +198,21 @@ class geneticMiner():
         #self.listOfPetrinets[0].printPetrinet()
         # print("Correct: ", self.listOfPetrinets[0].getConsumedAndProducedTokens())
         # print("difference: ", self.listOfPetrinets[0].getAllRemainingTokens())
-        
+
         print("fitness: ", self.listOfPetrinets[0].fitness)
         #print("accuracy: ", self.listOfPetrinets[0].accuracy)
+
         print("successActivities: ", self.listOfPetrinets[0].successActivities)
         print("numberOfActivitiesInLog: ", self.listOfPetrinets[0].numberOfActivitiesInLog)
 
         print("success traces: ", self.listOfPetrinets[0].successTraces)
         print("number of traces: ", self.listOfPetrinets[0].timesRun)
-        print("miner number of traces: ",  self.numberOfAllTraces)
         
 
         self.listOfPetrinets[0].createGraph()
         end_time = time.perf_counter()
         print("Time: ", end_time - start_time, " seconds")
+        print("Generations: ", self.doneGenerations)
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 
@@ -213,12 +221,12 @@ class geneticMiner():
 if __name__ == "__main__":    
     miner = geneticMiner()
     miner.main()
-    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5"), Place(0,"6"), Place(0,"7")]
+    # ps = [Place(1, "1"), Place(0, "2"), Place(0, "3"), Place(0, "4"), Place(0,"5"), Place(0,"6")]
     # ts = dict(
     # A=Transition("A", [Out(ps[0])], [In(ps[1]), In(ps[2])]), 
-    # B=Transition("B", [Out(ps[1]), Out(ps[4])], [In(ps[3]), In(ps[6])]),
-    # C=Transition("C", [Out(ps[2]), Out(ps[6])], [In(ps[3]), In(ps[4])]), 
-    # D=Transition("D", [Out(ps[3])], [In(ps[5])]),
+    # B=Transition("B", [Out(ps[1])], [In(ps[3])]),
+    # C=Transition("C", [Out(ps[2])], [In(ps[4])]), 
+    # D=Transition("D", [Out(ps[3]),Out(ps[4])], [In(ps[5])]),
     # )
 
     # firing_sequence = ["A", "B", "C", "D"] # alternative deterministic example
@@ -228,13 +236,11 @@ if __name__ == "__main__":
     # print("Accuracy: " ,pnet.accuracy)
     # pnet.resetTokens()
     # pnet.run(firing_sequence2)
-    # print("successActivities: ", pnet.successActivities)
-    # print("numberOfActivitiesInLog: ", pnet.numberOfActivitiesInLog)
-
-    # print("success traces: ", pnet.successTraces)
-    # print("number of traces: ", pnet.timesRun)
+    # print("allMissingTokens: ", pnet.allMissingTokens)
+    # print("allRemainingTokens: ", pnet.allRemainingTokens)
+    # print("Times run: ", pnet.timesRun)
     # print("Accuracy: " ,pnet.accuracy)
-    # pnet.calculateFitness()
+    # pnet.calculateFitness(30, 0.35)
     # print("fitness: ", pnet.fitness)
     # pnet.createGraph()
     
