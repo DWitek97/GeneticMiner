@@ -36,6 +36,7 @@ class geneticMiner():
         self.listOfPetrinets = []
         self.bestFitness = 0.0
         self.maxEnabledActivities = 1
+        self.doneGenerations = 0
 
     def createTransitions(self, listOfTransitions, listOfPlaces):
         transitionsList = {}
@@ -152,7 +153,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 1000
-        csv_datei = "logs/1-loop_complete.csv"
+        csv_datei = "logs/and_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -170,7 +171,8 @@ class geneticMiner():
         start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
         for generation in range(self.generations):
-        #while self.bestFitness < 0.9:
+        #while self.bestFitness < 0.8:
+            self.doneGenerations += 1
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
