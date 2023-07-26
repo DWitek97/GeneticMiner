@@ -33,6 +33,8 @@ class geneticMiner():
         self.elitismRate = 0.1
         self.crossOverRate = 0.1
         self.listOfPetrinets = []
+        self.doneGenerations = 0
+        self.bestFitness = 0
 
     def createTransitions(self, listOfTransitions, listOfPlaces):
         transitionsList = {}
@@ -145,7 +147,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 1000
-        csv_datei = "logs/1-loop_complete.csv"
+        csv_datei = "logs/big_example_net_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -161,7 +163,9 @@ class geneticMiner():
 
         start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
-        for generation in range(self.generations):
+        #for generation in range(self.generations):
+        while self.bestFitness < 0.9:
+            self.doneGenerations += 1
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
@@ -171,6 +175,8 @@ class geneticMiner():
                 petriNet.calculateFitness()
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
+            if self.bestFitness < self.listOfPetrinets[0].fitness:
+                self.bestFitness = self.listOfPetrinets[0].fitness
             bestIndividuals = self.listOfPetrinets[:int(self.populationSize * self.elitismRate)]
             offspring = self.doCrossOver(bestIndividuals)
 
@@ -185,14 +191,18 @@ class geneticMiner():
 
         self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
         #self.listOfPetrinets[0].printPetrinet()
+        
+        
         print("Correct: ", self.listOfPetrinets[0].getConsumedAndProducedTokens())
         print("difference: ", self.listOfPetrinets[0].getAllRemainingTokens())
+        print("\nfinal {}".format([p.holding for p in self.listOfPetrinets[0].places]))
         print("fitness: ", self.listOfPetrinets[0].fitness)
         print("accuracy: ", self.listOfPetrinets[0].accuracy)
         print("timesRun: ", self.listOfPetrinets[0].timesRun)
         self.listOfPetrinets[0].createGraph()
         end_time = time.perf_counter()
         print("Time: ", end_time - start_time, " seconds")
+        print("Done Generations: ", self.doneGenerations)
         # for net in self.listOfPetrinets:
         #     print("{:.2f}".format(net.fitness))
 

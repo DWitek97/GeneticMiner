@@ -38,7 +38,7 @@ class PetriNet():
                         #print(name, " didn't fire.")
                         #print("  =>  {}".format([p.holding for p in self.places]))
         self.calcualteAccuracy()
-        #print("\nfinal {}".format([p.holding for p in self.places]))
+        
         
 
     def createGraph(self):
