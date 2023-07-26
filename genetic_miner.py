@@ -42,6 +42,8 @@ class geneticMiner():
         for transition in listOfTransitions:
             
             duplicateList = []
+            duplicateListIn = []
+            duplicateListOut = []
             listOfOut = []
             listOfIn = []
 
@@ -55,21 +57,23 @@ class geneticMiner():
 
             for i in range(amountOfOutArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for outArc in duplicateList:
+                for outArc in duplicateListOut:
                     if listOfPlaces[index].name == outArc.place.name:
                         alreadyExists = True
                 if not alreadyExists:
-                    duplicateList.append(Out(listOfPlaces[index]))
+                    duplicateListOut.append(Out(listOfPlaces[index]))
                     listOfOut.append(Out(listOfPlaces[index]))
                 alreadyExists = False
 
+            alreadyExists = False
+
             for i in range(amountOfInArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for inArc in duplicateList:
+                for inArc in duplicateListIn:
                     if listOfPlaces[index].name == inArc.place.name:
                         alreadyExists = True
                 if not alreadyExists:
-                    duplicateList.append(In(listOfPlaces[index]))
+                    duplicateListIn.append(In(listOfPlaces[index]))
                     listOfIn.append(In(listOfPlaces[index]))
                 alreadyExists = False
 
@@ -147,7 +151,7 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        self.generations = 100
+        self.generations = 1000
         csv_datei = "logs/xor_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
@@ -165,8 +169,8 @@ class geneticMiner():
 
         start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
-        #for generation in range(self.generations):
-        while self.bestFitness < 0.9:
+        for generation in range(self.generations):
+        #while self.bestFitness < 0.9:
             for net in self.listOfPetrinets:
                 net.resetAll()
             for petriNet in self.listOfPetrinets:
