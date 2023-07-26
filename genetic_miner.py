@@ -47,8 +47,8 @@ class geneticMiner():
             # Can be removed if wanted, tokenreplay also works with 1-loops.
             alreadyExists = False
             
-            amountOfOutArcs = random.randint(1,4)
-            amountOfInArcs = random.randint(1,4)
+            amountOfOutArcs = random.randint(1,3)
+            amountOfInArcs = random.randint(1,3)
 
             for i in range(amountOfOutArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
@@ -144,7 +144,8 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        csv_datei = "logs/small_example_net_complete.csv"
+        self.generations = 1000
+        csv_datei = "logs/1-loop_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
