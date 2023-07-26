@@ -152,7 +152,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 1000
-        csv_datei = "logs/xor_complete.csv"
+        csv_datei = "logs/1-loop_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -218,7 +218,6 @@ class geneticMiner():
 
         print("success traces: ", self.listOfPetrinets[0].successTraces)
         print("number of traces: ", self.listOfPetrinets[0].timesRun)
-        print("miner number of traces: ",  self.numberOfAllTraces)
         
 
         self.listOfPetrinets[0].createGraph()
