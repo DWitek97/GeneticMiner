@@ -147,7 +147,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 1000
-        csv_datei = "logs/or_complete.csv"
+        csv_datei = "logs/small_example_net_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -183,7 +183,7 @@ class geneticMiner():
             for i in range(0, int(len(offspring) * self.mutateRate)):
                 n = random.randint(0, len(offspring) - 1)
                 offspring[n].mutate()
-
+            print("Current Fitness: ", self.bestFitness, " Generation: ", self.doneGenerations)
             # self.listOfPetrinets.clear()
             # self.listOfPetrinets.extend(bestIndividuals)
             # # self.listOfPetrinets.extend(offspring)
