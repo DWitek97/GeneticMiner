@@ -147,7 +147,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 1000
-        csv_datei = "logs/big_example_net_complete.csv"
+        csv_datei = "logs/or_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
