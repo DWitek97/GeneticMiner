@@ -152,7 +152,7 @@ class geneticMiner():
 
     def main(self):
         self.generations = 100
-        csv_datei = "logs/1-loop_complete.csv"
+        csv_datei = "logs/xor_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -171,7 +171,7 @@ class geneticMiner():
         # run tokenreplay of all traces for every net
         #for generation in range(self.generations):
            
-        while self.bestFitness < 0.6:
+        while self.bestFitness < 0.9:
             self.doneGenerations += 1
             for net in self.listOfPetrinets:
                 net.resetAll()
