@@ -58,11 +58,11 @@ class geneticMiner():
 
             for i in range(amountOfOutArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for outArc in duplicateListOut:
+                for outArc in duplicateList:
                     if listOfPlaces[index].name == outArc.place.name:
                         alreadyExists = True
                 if not alreadyExists:
-                    duplicateListOut.append(Out(listOfPlaces[index]))
+                    duplicateList.append(Out(listOfPlaces[index]))
                     listOfOut.append(Out(listOfPlaces[index]))
                 alreadyExists = False
 
@@ -70,11 +70,11 @@ class geneticMiner():
 
             for i in range(amountOfInArcs):
                 index = random.randint(0, len(listOfPlaces) -1 )
-                for inArc in duplicateListIn:
+                for inArc in duplicateList:
                     if listOfPlaces[index].name == inArc.place.name:
                         alreadyExists = True
                 if not alreadyExists:
-                    duplicateListIn.append(In(listOfPlaces[index]))
+                    duplicateList.append(In(listOfPlaces[index]))
                     listOfIn.append(In(listOfPlaces[index]))
                 alreadyExists = False
 
@@ -152,8 +152,8 @@ class geneticMiner():
         return listOfOffspring
 
     def main(self):
-        self.generations = 1000
-        csv_datei = "logs/small_example_net_complete.csv"
+        self.generations = 50000
+        csv_datei = "logs/and_complete.csv"
         reader = logreader()
         traces = reader.readLogs(csv_datei)
         self.allActivities = reader.getAllActivities()
@@ -170,8 +170,9 @@ class geneticMiner():
 
         start_time = time.perf_counter()
         # run tokenreplay of all traces for every net
-        #for generation in range(self.generations):
-        while self.bestFitness < 0.9:
+        currentFitness = 0
+        for generation in range(self.generations):
+        #while self.bestFitness < 0.9:
             self.doneGenerations += 1
             for net in self.listOfPetrinets:
                 net.resetAll()
@@ -186,7 +187,9 @@ class geneticMiner():
                      self.maxEnabledActivities = self.listOfPetrinets[0].enabledActivities
                 petriNet.calculateFitness(self.maxEnabledActivities, 0.2)
 
-
+            if currentFitness != self.bestFitness:
+                print("Current Fitness: ", self.bestFitness, " Generation: ", self.doneGenerations)
+            currentFitness = self.bestFitness
 
             self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)
             self.bestFitness = self.listOfPetrinets[0].fitness
@@ -200,8 +203,9 @@ class geneticMiner():
             self.listOfPetrinets.clear()
             self.listOfPetrinets.extend(bestIndividuals)
             self.listOfPetrinets.extend(offspring)
-            self.initializeNextPopulation(len(bestIndividuals), 0)
-            print("Current Fitness: ", self.bestFitness, " ", "Done Generations: ", self.doneGenerations)
+            self.initializeNextPopulation(len(bestIndividuals), len(offspring))
+            #print("Current Fitness: ", self.bestFitness, " ", "Done Generations: ", self.doneGenerations)
+            
 
         self.listOfPetrinets.sort(key=lambda x: x.fitness, reverse=True)    
         #self.listOfPetrinets[0].printPetrinet()

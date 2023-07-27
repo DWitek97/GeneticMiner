@@ -1,9 +1,16 @@
 digraph "Fittest net" {
 	node [shape=box]
-	A [label=A]
+	G [label=G]
+	J [label=J]
 	B [label=B]
-	D [label=D]
+	I [label=I]
+	H [label=H]
 	C [label=C]
+	E [label=E]
+	A [label=A]
+	F [label=F]
+	K [label=K]
+	D [label=D]
 	node [shape=circle]
 	1 [label=" "]
 	2 [label=" "]
@@ -11,15 +18,47 @@ digraph "Fittest net" {
 	4 [label=" "]
 	5 [label=" "]
 	6 [label=" "]
+	7 [label=" "]
+	8 [label=" "]
+	9 [label=" "]
+	10 [label=" "]
+	11 [label=" "]
+	12 [label=" "]
+	13 [label=" "]
+	6 -> G
+	11 -> G
+	G -> 1
+	G -> 10
+	G -> 5
+	11 -> J
+	4 -> J
+	J -> 2
+	4 -> B
+	B -> 3
+	B -> 10
+	3 -> I
+	6 -> I
+	11 -> I
+	5 -> I
+	I -> 11
+	8 -> H
+	4 -> H
+	11 -> H
+	4 -> H
+	10 -> C
+	3 -> C
+	C -> 11
+	7 -> E
+	2 -> E
+	10 -> E
+	E -> 2
 	1 -> A
-	A -> 6
-	6 -> B
-	B -> 2
-	B -> 5
-	2 -> D
-	5 -> D
-	D -> 6
-	6 -> C
-	C -> 2
-	C -> 5
+	A -> 4
+	9 -> F
+	11 -> F
+	11 -> K
+	2 -> K
+	11 -> D
+	D -> 5
+	D -> 2
 }
